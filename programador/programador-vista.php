@@ -3,42 +3,49 @@
 .materias-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 20px;
     justify-content: center;
+    padding: 20px;
 }
 
 .materia-card {
-    width: 180px;
-    height: 180px;
-    border: 2px solid #ccc;
-    border-radius: 10px;
+    width: 200px;
+    height: 200px;
+    border: 1px solid #ddd;
+    border-radius: 16px;
+    background: linear-gradient(to bottom right, #ffffff, #f0f4f8);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     text-align: center;
     padding: 20px;
     font-size: 18px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease-in-out;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: #f9f9f9;
 }
 
 .materia-card:hover {
-    background-color: #e0e0e0;
+    background: linear-gradient(to bottom right, #e8f0fe, #dbe9ff);
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.3);
 }
 
 .materia-card.seleccionada {
-    border-color: #007bff;
-    background-color: #d0e4ff;
-    transform: scale(1.1);
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+    border: 2px solid #007bff;
+    background: linear-gradient(to bottom right, #d6e9ff, #c2ddff);
+    transform: scale(1.08);
+    box-shadow: 0 6px 18px rgba(0, 123, 255, 0.4);
 }
 
 .icono {
-    font-size: 40px;
+    font-size: 42px;
+    margin-bottom: 10px;
+    color: #007bff;
 }
 </style>
+
 
 <?php
 include_once '../componentes/header.php';
@@ -89,6 +96,7 @@ $result_programas = $conn->query($sql_programas);
                                     <div class="form-group">
                                         <label for="programa">Programa</label>
                                         <select id="programa" name="programa" class="form-control">
+                                            <option value="">Seleccione un Programa</option>
                                             <?php
                                             if ($result_programas->num_rows > 0) {
                                                 while ($row = $result_programas->fetch_assoc()) {
@@ -102,30 +110,12 @@ $result_programas = $conn->query($sql_programas);
                                     </div>
 
                                     <br>
-                                    <label class="titulo">Seleccione una Materia: </label>
-                                    <div class="materias-container">
-                                        <?php
-                                        $sql_materias = "SELECT m.id_modulo, p.nombre AS programa, m.nombre 
-                                                        FROM modulos m
-                                                        JOIN programas p ON m.id_programa = p.id_programa";
-                                        $result_materias = $conn->query($sql_materias);
-
-                                        if ($result_materias->num_rows > 0) {
-                                            while ($row_materia = $result_materias->fetch_assoc()) {
-                                                echo '
-                                                <div class="materia-card" onclick="seleccionarMateria(' . $row_materia['id_modulo'] . ')" id="materia_' . $row_materia['id_modulo'] . '">
-                                                    <div class="icono">📚</div>
-                                                    <h6>' . $row_materia['nombre'] . '</h6>
-                                                    <p class="fs-7">' . '</p>
-                                                </div>';
-                                            }
-                                        } else {
-                                            echo '<p>No hay materias disponibles.</p>';
-                                        }
-                                        ?>
+                                    <div class="modulos-container" id="modulosContainer">
+                                        <!-- Aquí se llenarán dinámicamente las tarjetas -->
                                     </div>
-                                    <input type="hidden" name="materia" id="materiaSeleccionada">
-                                </div>
+
+                                    <input type="hidden" name="modulo" id="moduloSeleccionado">
+
                         </div>
                     </div>
                 </div>
@@ -460,4 +450,64 @@ function seleccionarMateria(idMateria) {
         }
     });
 }
+</script>
+<script>
+    document.getElementById("programa").addEventListener("change", function () {
+        let idPrograma = this.value;
+
+        if (idPrograma === "") {
+            document.getElementById("modulosContainer").innerHTML = "<p>Seleccione un programa primero.</p>";
+            return;
+        }
+
+        fetch("Programador-Controlador.php?accion=buscarMateriaPorPrograma", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "id_programa=" + encodeURIComponent(idPrograma)
+        })
+        .then(response => response.json())
+        .then(data => {
+            let container = document.getElementById("modulosContainer");
+            container.innerHTML = "";
+
+            if (data.status === "success" && data.modulos.length > 0) {
+                data.modulos.forEach(modulo => {
+                    let card = document.createElement("div");
+                    card.className = "materia-card";
+                    card.id = "modulo_" + modulo.id;
+                    card.innerHTML = `
+                        <div class="icono">📚</div>
+                        <h6>${modulo.nombre}</h6>
+                        <p class="fs-7"></p>
+                    `;
+                    card.onclick = function () {
+                        seleccionarModulo(modulo.id);
+                    };
+                    container.appendChild(card);
+                });
+            } else {
+                container.innerHTML = "<p>No hay módulos disponibles para este programa.</p>";
+            }
+        })
+        .catch(error => {
+            console.error("Error al cargar módulos:", error);
+            document.getElementById("modulosContainer").innerHTML = "<p>Error al cargar módulos.</p>";
+        });
+    });
+
+    // Esta función se llama al hacer clic en una tarjeta
+    function seleccionarModulo(id) {
+        document.getElementById("moduloSeleccionado").value = id;
+
+        // Quitar selección previa
+        document.querySelectorAll(".modulo-card").forEach(card => {
+            card.classList.remove("seleccionada");
+        });
+
+        // Marcar como seleccionada
+        let cardSeleccionada = document.getElementById("modulo_" + id);
+        if (cardSeleccionada) {
+            cardSeleccionada.classList.add("seleccionada");
+        }
+    }
 </script>

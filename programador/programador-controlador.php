@@ -72,6 +72,46 @@ switch ($accion) {
     
         $stmt->close();
         break;
+        
+        case 'buscarMateriaPorPrograma':
+            $programa = $_POST['id_programa'] ?? null;
+        
+            if ($programa !== null) {
+                $sql_modulo = "SELECT id_modulo AS id, nombre FROM modulos WHERE id_programa = ?";
+                $stmt = $conn->prepare($sql_modulo);
+            
+                if ($stmt) {
+                    $stmt->bind_param("i", $programa);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+            
+                    $modulos = [];
+                    while ($row = $result->fetch_assoc()) {
+                        $modulos[] = [
+                            'id' => $row['id'],
+                            'nombre' => $row['nombre']
+                        ];
+                    }
+            
+                    echo json_encode([
+                        'status' => 'success',
+                        'modulos' => $modulos
+                    ]);
+                    
+                    $stmt->close();
+                } else {
+                    echo json_encode([
+                        'status' => 'error',
+                        'message' => 'Error al preparar la consulta: ' . $conn->error
+                    ]);
+                }
+            } else {
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'ID del programa no proporcionado.'
+                ]);
+            }
+            break;        
         case 'reprogramar':        
             // Recibir datos del formulario
             $fecha = $_POST['nueva_fecha'] ?? null;
