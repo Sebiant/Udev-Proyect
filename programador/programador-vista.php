@@ -1,3 +1,45 @@
+<!-- Estilos CSS para mejorar el diseño -->
+<style>
+.materias-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+.materia-card {
+    width: 180px;
+    height: 180px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    text-align: center;
+    padding: 20px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #f9f9f9;
+}
+
+.materia-card:hover {
+    background-color: #e0e0e0;
+}
+
+.materia-card.seleccionada {
+    border-color: #007bff;
+    background-color: #d0e4ff;
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+}
+
+.icono {
+    font-size: 40px;
+}
+</style>
+
 <?php
 include_once '../componentes/header.php';
 include '../conexion.php';
@@ -10,6 +52,14 @@ $result_salones = $conn->query($sql_salones);
 
 $sql_periodos = "SELECT id_periodo, nombre FROM periodos";
 $result_periodos = $conn->query($sql_periodos);
+
+$sql_programas = "
+    SELECT DISTINCT p.id_programa, p.nombre
+    FROM modulos m
+    JOIN programas p ON m.id_programa = p.id_programa
+";
+$result_programas = $conn->query($sql_programas);
+
 ?>
 
 <div class="container mt-5">
@@ -25,6 +75,33 @@ $result_periodos = $conn->query($sql_periodos);
                         <div class="card-body">
                             <form id="formProgramador">
                                 <div class="form-group">
+
+                                    <div class="form-group">
+                                        <label for="periodo">Periodo</label>
+                                        <select id="periodo" name="periodo" class="form-control">
+                                            <option value="">Seleccione Periodo</option>
+                                            <?php while ($row = $result_periodos->fetch_assoc()): ?>
+                                                <option value="<?php echo $row['id_periodo']; ?>"><?php echo $row['nombre']; ?></option>
+                                            <?php endwhile; ?>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="programa">Programa</label>
+                                        <select id="programa" name="programa" class="form-control">
+                                            <?php
+                                            if ($result_programas->num_rows > 0) {
+                                                while ($row = $result_programas->fetch_assoc()) {
+                                                    echo "<option value='" . htmlspecialchars($row['id_programa']) . "'>" . htmlspecialchars($row['nombre']) . "</option>";
+                                                }
+                                            } else {
+                                                echo "<option value=''>No hay programas disponibles</option>";
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+
+                                    <br>
                                     <label class="titulo">Seleccione una Materia: </label>
                                     <div class="materias-container">
                                         <?php
@@ -39,7 +116,7 @@ $result_periodos = $conn->query($sql_periodos);
                                                 <div class="materia-card" onclick="seleccionarMateria(' . $row_materia['id_modulo'] . ')" id="materia_' . $row_materia['id_modulo'] . '">
                                                     <div class="icono">📚</div>
                                                     <h6>' . $row_materia['nombre'] . '</h6>
-                                                    <p class="fs-7">' . "Programa: " . $row_materia['programa'] . '</p>
+                                                    <p class="fs-7">' . '</p>
                                                 </div>';
                                             }
                                         } else {
@@ -49,48 +126,42 @@ $result_periodos = $conn->query($sql_periodos);
                                     </div>
                                     <input type="hidden" name="materia" id="materiaSeleccionada">
                                 </div>
-
-                                <div class="form-group">
-                                    <label for="docente">Docente</label>
-                                    <select id="docente" name="docente" class="form-control">
-                                        <option value="">Seleccione Docente</option>
-                                        <?php while ($row = $result_docentes->fetch_assoc()): ?>
-                                            <option value="<?php echo $row['numero_documento']; ?>">
-                                                <?php echo $row['nombres'] . " " . $row['apellidos']; ?>
-                                            </option>
-                                        <?php endwhile; ?>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="salon">Salón</label>
-                                    <select id="salon" name="salon" class="form-control">
-                                        <option value="">Seleccione Salón</option>
-                                        <?php while ($row = $result_salones->fetch_assoc()): ?>
-                                            <option value="<?php echo $row['id_salon']; ?>">
-                                                <?php echo $row['nombre_salon']; ?>
-                                            </option>
-                                        <?php endwhile; ?>
-                                    </select>
-                                </div>
                         </div>
                     </div>
                 </div>
-
                 <div class="col-md-6">
                     <div class="card h-100">
                         <div class="card-header">Programación de Horario y Modalidad</div>
                         <div class="card-body">
+
+                            <h5 class="mb-3">Docente y Salon</h5>
                             <div class="form-group">
-                                <label for="periodo">Periodo</label>
-                                <select id="periodo" name="periodo" class="form-control">
-                                    <option value="">Seleccione Periodo</option>
-                                    <?php while ($row = $result_periodos->fetch_assoc()): ?>
-                                        <option value="<?php echo $row['id_periodo']; ?>"><?php echo $row['nombre']; ?></option>
+                                <label for="docente">Docente</label>
+                                <select id="docente" name="docente" class="form-control">
+                                    <option value="">Seleccione Docente</option>
+                                    <?php while ($row = $result_docentes->fetch_assoc()): ?>
+                                        <option value="<?php echo $row['numero_documento']; ?>">
+                                            <?php echo $row['nombres'] . " " . $row['apellidos']; ?>
+                                        </option>
                                     <?php endwhile; ?>
                                 </select>
                             </div>
 
+                            <div class="form-group">
+                                <label for="salon">Salón</label>
+                                <select id="salon" name="salon" class="form-control">
+                                    <option value="">Seleccione Salón</option>
+                                    <?php while ($row = $result_salones->fetch_assoc()): ?>
+                                        <option value="<?php echo $row['id_salon']; ?>">
+                                            <?php echo $row['nombre_salon']; ?>
+                                        </option>
+                                    <?php endwhile; ?>
+                                </select>
+                            </div>
+
+                            <hr>
+
+                            <h5 class="mb-3">Horario</h5>
                             <div class="form-group">
                                 <label for="dia">Día de la Semana</label>
                                 <select id="dia" name="dia" class="form-control">
@@ -114,6 +185,9 @@ $result_periodos = $conn->query($sql_periodos);
                                 <input type="time" id="horaSalida" name="horaSalida" class="form-control">
                             </div>
 
+                            <hr>
+
+                            <h5 class="mb-3">Modalidad</h5>
                             <div class="form-group">
                                 <label for="modalidad">Modalidad</label>
                                 <select id="modalidad" name="modalidad" class="form-control">
@@ -121,9 +195,11 @@ $result_periodos = $conn->query($sql_periodos);
                                     <option value="virtual">Virtual</option>
                                 </select>
                             </div>
+
                         </div>
                     </div>
                 </div>
+
             </div>
             </form>
         </div>
@@ -385,45 +461,3 @@ function seleccionarMateria(idMateria) {
     });
 }
 </script>
-
-<!-- Estilos CSS para mejorar el diseño -->
-<style>
-.materias-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
-}
-
-.materia-card {
-    width: 180px;
-    height: 180px;
-    border: 2px solid #ccc;
-    border-radius: 10px;
-    text-align: center;
-    padding: 20px;
-    font-size: 18px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: #f9f9f9;
-}
-
-.materia-card:hover {
-    background-color: #e0e0e0;
-}
-
-.materia-card.seleccionada {
-    border-color: #007bff;
-    background-color: #d0e4ff;
-    transform: scale(1.1);
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
-}
-
-.icono {
-    font-size: 40px;
-}
-</style>

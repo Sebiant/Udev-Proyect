@@ -26,7 +26,7 @@ $(document).ready(function () {
                 data: "estado",
                 render: function (data, type, row) {
                     if (data === 'Perdida') {
-                        return `<button class="btn btn-danger reprogramar-btn" data-bs-toggle="modal" data-bs-target="#modalReprogramar" data-id="${row.id_programador}">Reprogramar</button>`;
+                        return `<button class="btn btn-danger reprogramar-btn" data-bs-toggle="modal" data-bs-target="#modalReprogramar" data-id="${row.id_programador}">Reagendar</button>`;
                     } else {
                         return `<span>${data}</span>`;
                     }

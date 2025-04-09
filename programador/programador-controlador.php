@@ -276,6 +276,16 @@ switch ($accion) {
         $result = $stmt->get_result();
         $data = $result->fetch_all(MYSQLI_ASSOC);
         
+        // Modificar los estados antes de enviarlos
+        foreach ($data as &$row) {
+            if ($row['estado'] === 'Reprogramada') {
+                $row['estado'] = 'Reagendada';
+            } elseif ($row['estado'] === 'Pendiente') {
+                $row['estado'] = 'Agendada';
+            }
+        }
+        unset($row); // buena práctica para evitar referencias accidentales
+
         // Respuesta JSON para DataTables
         $response = [
             "draw" => $draw,
