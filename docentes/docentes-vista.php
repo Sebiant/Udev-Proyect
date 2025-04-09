@@ -156,7 +156,7 @@ include_once '../componentes/header.php';
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email:</label>
-                        <input type="email" name="email" class="form-control" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" placeholder="Email">
+                        <input type="email" name="correo" class="form-control" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" placeholder="Email">
                     </div>                    
                         <div class="form-check mb-3">
                         <input type="checkbox" class="form-check-input" id="declara_renta_editar" name="declara_renta">
@@ -249,7 +249,7 @@ include_once '../componentes/footer.php';
             contentType: false,
             success: function(response) {
                 console.log('Respuesta del servidor:', response);
-                location.reload();
+                //location.reload();
             },
             error: function(xhr, status, error) {
                 console.error('Error:', error);

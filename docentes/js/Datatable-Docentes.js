@@ -82,7 +82,7 @@ $(document).ready(function() {
                     $('#editForm [name="perfil_profesional"]').val(docente.perfil_profesional);
                     $('#editForm [name="telefono"]').val(docente.telefono);
                     $('#editForm [name="direccion"]').val(docente.direccion);
-                    $('#editForm [name="email"]').val(docente.email);
+                    $('#editForm [name="correo"]').val(docente.correo);
                     $('#editForm [name="declara_renta"]').prop('checked', String(docente.declara_renta) === "1");
                     $('#editForm [name="retenedor_iva"]').prop('checked', String(docente.retenedor_iva) === "1");                    
                     $('#editModal').modal('show');
