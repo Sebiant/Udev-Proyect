@@ -113,3 +113,69 @@ $(document).ready(function () {
         });
     });
 });
+
+
+function ProgramarClase() {
+    const form = document.getElementById("formProgramador"); 
+    const formData = new FormData(form);
+
+    console.log("Datos del formulario:");
+    for (const [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+    }
+    $.ajax({
+        url: 'Programador-Controlador.php?accion=crear',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            console.log('Respuesta del servidor:', response);
+            location.reload();
+        },
+        error: function(xhr, status, error) {
+            alert('Error:', error);
+        }
+    });
+}
+
+function GuardarClase() {
+    const formData = new FormData(document.getElementById('editarClaseForm'));
+
+    console.log('Datos del formulario:', ...formData.entries());
+
+    $.ajax({
+        url: 'Programador-Controlador.php?accion=editar',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            console.log('Respuesta del servidor:', response);
+            location.reload();
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+        }
+    });
+}
+function reprogramarClase() {
+    const formData = new FormData(document.getElementById('formReprogramar'));
+    console.log(...formData);
+
+    $.ajax({
+        url: "Programador-Controlador.php?accion=reprogramar",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            console.log("Respuesta del servidor:", response);
+            location.reload();
+        },
+        error: function(xhr, status, error) {
+            console.error("Error:", error);
+            alert("Hubo un problema al procesar la solicitud.");
+        }
+    });
+}
