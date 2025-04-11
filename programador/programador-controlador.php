@@ -5,15 +5,35 @@ $accion = $_GET['accion'] ?? 'default';
 
 switch ($accion) {
     case 'crear':
-        $dia = $_POST['dia'];
-        $hora_inicio = $_POST['horaEntrada'];
-        $hora_salida = $_POST['horaSalida'];
-        $salon = $_POST['salon'];
-        $docente = $_POST['docente'];
-        $periodo = $_POST['periodo'];
-        $modulo = $_POST['materia'];
-        $estado = 'Pendiente';
-        $modalidad = $_POST['modalidad'];
+        if (
+            isset($_POST['dia']) &&
+            isset($_POST['horaEntrada']) &&
+            isset($_POST['horaSalida']) &&
+            isset($_POST['salon']) &&
+            isset($_POST['docente']) &&
+            isset($_POST['periodo']) &&
+            isset($_POST['modulo']) &&
+            isset($_POST['modalidad'])
+        ) {
+            // Aquí puedes asignar tus variables con seguridad
+            $dia = $_POST['dia'];
+            $hora_inicio = $_POST['horaEntrada'];
+            $hora_salida = $_POST['horaSalida'];
+            $salon = $_POST['salon'];
+            $docente = $_POST['docente'];
+            $periodo = $_POST['periodo'];
+            $modulo = $_POST['modulo'];
+            $modalidad = $_POST['modalidad'];
+            $estado = 'Pendiente';
+        
+            // Continúas con tu lógica (guardar, insertar, etc.)
+        } else {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Faltan datos obligatorios en el formulario."
+            ]);
+            exit;
+        }        
     
         // Validación 1: Hora de salida debe ser posterior a la de entrada
         if (!validarHorasEntradaSalida($hora_inicio, $hora_salida)) {
@@ -57,19 +77,27 @@ switch ($accion) {
     
         $fechas_generadas = [];
     
+        $contador = 0; 
         while ($fecha_inicio <= $fecha_fin) {
             $fecha_str = $fecha_inicio->format("Y-m-d");
             
-            // Validación 3: No es día festivo
-            if (esFestivo($fecha_str, $conn)) {
-                $fecha_inicio->modify("+7 days");
-                continue;
-            }
+               /* // Validación 3: No es día festivo
+                if (esFestivo($fecha_str, $conn)) {
+                    $fecha_inicio->modify("+7 days"); 
+                    continue;
+                }
+            
+                // Aquí puedes agregar tu lógica para días válidos
+                // ...
+            
+                $contador++; 
+                $fecha_inicio->modify("+7 days"); 
+            
     
             // Validación 4: Docente disponible
             if (!docenteDisponible($docente, $fecha_str, $hora_inicio, $hora_salida, $conn)) {
                 die(json_encode(['status' => 'error', 'message' => "El docente no está disponible el {$fecha_str} de {$hora_inicio} a {$hora_salida}"]));
-            }
+            }*/
     
             // Validación 5: Salón disponible
             if (!salonDisponible($salon, $fecha_str, $hora_inicio, $hora_salida, $conn)) {
@@ -420,15 +448,6 @@ function salonDisponible($salon_id, $fecha, $hora_inicio, $hora_fin, $conn, $exc
     $stmt->store_result();
 
     return ($stmt->num_rows === 0); // True si está disponible
-}
-function esFestivo($fecha, $conn) {
-    $sql = "SELECT fecha FROM dias_festivos WHERE fecha = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param('s', $fecha);
-    $stmt->execute();
-    $stmt->store_result();
-
-    return ($stmt->num_rows > 0); // True si es festivo
 }
 function horarioLaboralValido($hora_inicio, $hora_fin) {
     $hora_min = '07:00:00';
