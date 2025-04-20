@@ -117,8 +117,11 @@ function obtener_registros($conn)
 {
     $query = "";
     $salida = array();
-    $query = "SELECT convenio.codigo_convenio, convenio.codigo_estudiante, estudiantes.nombre_estudiante, estudiantes.apellidos_estudiante, convenio.id_programa, programas.nombre, 
-    convenio.descripcion_convenio, tipo_convenio.codigo_tipo_convenio, tipo_convenio.valor_descuento, convenio.valor_total_convenio, convenio.saldo_convenio, convenio.estado 
+    $query = "SELECT convenio.codigo_convenio, convenio.codigo_estudiante, estudiantes.nombre_estudiante, estudiantes.apellidos_estudiante, convenio.id_programa, programas.nombre, programas.valor_total_programa,
+    convenio.descripcion_convenio, tipo_convenio.codigo_tipo_convenio, tipo_convenio.valor_descuento, convenio.valor_total_convenio, convenio.saldo_convenio, convenio.estado, 
+    IFNULL(( SELECT SUM(movimientos.valor_movimiento)
+    FROM movimientos
+    WHERE movimientos.codigo_estudiante = convenio.codigo_estudiante), 0) AS total_pagos
     FROM convenio 
     INNER JOIN estudiantes 
     ON convenio.codigo_estudiante = estudiantes.codigo_estudiante 
@@ -197,10 +200,13 @@ function obtener_registros($conn)
             $buttonClass = ($estado === "Activo") ? "btn-danger" : "btn-success";
             $buttonText = ($estado === "Activo") ? "Inactivar" : "Activar";
 
-           $porcent= $fila["valor_descuento"];
-           $valor_porcent=$fila["valor_total_convenio"];
-           $total_cal=(($valor_porcent * $porcent) / 100);
-           $TOTAL=$valor_porcent - $total_cal;
+            $valor_movimientos=$fila['total_pagos'];
+            
+            $porcent= $fila["valor_descuento"];
+            $valor_porcent=$fila["valor_total_programa"];
+            $total_cal=(($valor_porcent * $porcent) / 100);
+            $TOTAL=$valor_porcent - $total_cal;
+            $saldo_actual=$TOTAL-$valor_movimientos;
 
             if(!$fila["valor_descuento"]){
                 $fila["valor_descuento"] = 0;
@@ -215,9 +221,10 @@ function obtener_registros($conn)
                 $fila["nombre"],
                 $fila["descripcion_convenio"],
                 $fila["valor_descuento"] . ' %',
-                $fila["valor_total_convenio"],
+                $fila["valor_total_programa"],
                 $TOTAL,
-                $fila["saldo_convenio"],
+                $saldo_actual,
+                //$fila["saldo_convenio"],
                 $estado,
                 //boton modificar
             '<button type="button" data-bs-toggle="modal" data-bs-target="#modalCrearConvenio" name="acciones" id="' . $codigo_convenio . '" class="btn btn-primary w-100 editar">Modificar</button>',

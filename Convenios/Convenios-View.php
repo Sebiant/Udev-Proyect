@@ -23,7 +23,7 @@
 
   $sqlEstudiante="SELECT codigo_estudiante, nombre_estudiante, apellidos_estudiante FROM estudiantes WHERE estado = 1";
   $resultEstudiantes = $conn->query($sqlEstudiante);
-  $sqlPrograma="SELECT id_programa, nombre FROM programas WHERE estado = 1";
+  $sqlPrograma="SELECT id_programa, nombre, valor_total_programa FROM programas WHERE estado = 1";
   $resultPrograma = $conn->query($sqlPrograma);
   $sqlDescuento="SELECT codigo_tipo_convenio, descripcion_tipo_usuario, valor_descuento FROM tipo_convenio WHERE estado = 1";
   $resultDesct = $conn->query($sqlDescuento);
@@ -139,7 +139,7 @@
                   if($resultPrograma->num_rows >0){ 
 
                     while ($row =$resultPrograma->fetch_assoc()){
-                      echo "<option value='" . $row['id_programa'] . "'>" . $row['nombre'] . "</option>";
+                      echo "<option value='" . $row['id_programa'] . "'>" . $row['nombre'] . " $ " . $row['valor_total_programa'] . "</option>";
                     }
 
                   }
@@ -168,14 +168,14 @@
               <label for="tipo_convenio">tipo convenio</label>
               <input type="text" name="tipo_convenio" id="tipo_convenio" class="form-control">
               <br>-->
-
+<!--
               <label for="valor_total_convenio">Valor total</label>
-              <input type="number" name="valor_total_convenio" id="valor_total_convenio" class="form-control">
+              <input type="number" name="valor_total_convenio" id="valor_total_convenio" class="form-control" value="<?php echo $row['valor_total_programa'] ?>">
               <br>
 
               <label for="saldo_convenio">saldo total</label>
               <input type="number" name="saldo_convenio" id="saldo_convenio" class="form-control">
-              <br>
+              <br>-->
 
 
 
@@ -274,7 +274,7 @@
                   </thead>
                   <tbody>
                     <!-- Aquí se mostrarán los pagos -->
-                    <?php include("./Convenios-Util.php"); ?>
+                    <?php //include("./Convenios-Util.php"); ?>
                   </tbody>
                 </table>
               </div>
@@ -438,9 +438,51 @@
 
           });
 
+          $(document).on('click', '.info', function(){
+    var codigo_convenio = $(this).attr("id");
+    
+    // Un solo llamado que maneje ambos casos
+    $.ajax({
+        url: "Convenios-Function.php",
+        method: "POST",
+        data: {
+            codigo_convenio: codigo_convenio,
+            operacion: 'registro_completo' // Nueva operación unificada
+        },
+        dataType: "json",
+        success: function(data) {
+            // Datos del estudiante
+            $('#codigo_estudiant').val(data.estudiante.codigo_estudiante);
+            $('#nombre_estudiante').val(data.estudiante.nombre_estudiante);
+            $('#apellidos_estudiante').val(data.estudiante.apellidos_estudiante);
+            $('#fecha_naci_estu').val(data.estudiante.fecha_nacimiento_estudiante);
+            $('#carrera_estudiante').val(data.estudiante.nombre);
+                //Actualiza la imagen del estudiante
+            $('#imagen').attr('src', data.estudiante.imagen); // Ruta de la imagen desde la base de datos
+            
+            // Movimientos
+            var tbody = $('#datos_pagos_estudiante tbody').empty();
+            $.each(data.movimientos, function(index, mov) {
+                tbody.append(`
+                    <tr>
+                        <td>${mov.id_movimiento}</td>
+                        <td>${mov.fecha_movimiento}</td>
+                        <td>${mov.descripcion}</td>
+                        <td>${mov.valor_movimiento}</td>
+                        <!-- <td><input type="checkbox" class="form-check-input"></td> -->
+                    </tr>
+                `);
+            });
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error("Error:", textStatus, errorThrown);
+        }
+    });
+});
+
           /*Script ajax para la consulta de los registros mandando 
           como referencia el codigo de convenio*/
-          $(document).on('click', '.info', function(){
+          /*$(document).on('click', '.info', function(){
             var codigo_convenio = $(this).attr("id");
             $.ajax({
               url: "Convenios-Function.php",
@@ -455,7 +497,7 @@
                 console.log("este es el nombre" + data.nombre_estudiante)
                 
                 /*valida y rellena la informacion con la data recibida de la DB*/
-                $('#modalInfoEstudiante').modal('show');
+                /*$('#modalInfoEstudiante').modal('show');
                 $('#codigo_estudiant').val(data.codigo_estudiante);
                 $('#nombre_estudiante').val(data.nombre_estudiante);
                 $('#apellidos_estudiante').val(data.apellidos_estudiante);
@@ -480,16 +522,27 @@
 
             })
 
-            $.ajax({
+          /*  $.ajax({
               url:"Convenios-Util.php",
               method:"POST",
               data:{
-                codigo_convenios: codigo_convenio,
+                codigo_convenio: codigo_convenio,
+                operacion:'registro_movimientos'
                 
               },
+              success:function(dataMovimientos){
+                //inserta los movimientos en la tabla
+               /*$('#datos_pagos_estudiante tbody').html(dataMovimientos)
+              },
+              error: function(jqXHR, textStatus, errorThrown) {
+            console.error("Error movimientos:", textStatus, errorThrown);
+            $('#datos_pagos_estudiante tbody').html(
+                '<tr><td colspan="5">Error al cargar movimientos</td></tr>'
+            );
+        }
             })
           })
-
+*/
           $(document).on('click', '.btn-toggle-state', function(){
             var id = $(this).data('id');
             var estadoActual = $(this).data('estado');

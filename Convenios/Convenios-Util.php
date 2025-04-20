@@ -12,7 +12,7 @@ if($conn){
     WHERE movimientos.codigo_estudiante = ? ";
     $stmt = $conn->prepare($consulta);
 
-    $id_recibido=intval($_POST['codigo_convenios']);
+    $id_recibido=intval($_POST['codigo_convenio']);
     //echo $id_recibido;
 
     
