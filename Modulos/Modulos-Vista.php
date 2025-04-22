@@ -1,7 +1,7 @@
 <?php
 include_once '../componentes/header.php';
 include '../conexion.php';
-$sql_programa = "SELECT id_programa, nombre FROM programas";
+$sql_programa = "SELECT id_programa, nombre FROM programas WHERE estado = 1";
 $result_programa = $conn->query($sql_programa);
 if (!$result_programa) {
     die("Error en la consulta: " . $conn->error);
