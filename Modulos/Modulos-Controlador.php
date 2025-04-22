@@ -52,19 +52,41 @@ switch ($accion) {
             break;
         
     
-        case 'cambiarEstado':
-            $id_modulo = $_POST['id_modulo'];
-            $estado = $_POST['estado'];
-        
-            $sql = "UPDATE modulos SET estado=$estado WHERE id_modulo='$id_modulo'";
-        
-            if ($conn->query($sql) === TRUE) {
-            } else {
-                echo "Error al cambiar el estado: " . $conn->error;
-            }
-            break;
-        
-        
+            case 'cambiarEstado':
+                $id_modulo = $_POST['id_modulo'];
+                $estado = $_POST['estado'];
+            
+                // Primero consultamos si el programa del módulo está activo
+                $sql_validacion = "
+                    SELECT p.estado AS estado_programa 
+                    FROM modulos m 
+                    INNER JOIN programas p ON m.id_programa = p.id_programa 
+                    WHERE m.id_modulo = '$id_modulo'
+                ";
+            
+                $resultado = $conn->query($sql_validacion);
+            
+                if ($resultado && $resultado->num_rows > 0) {
+                    $fila = $resultado->fetch_assoc();
+                    $estado_programa = $fila['estado_programa'];
+            
+                    if ($estado_programa != 1 && $estado == 1) {
+                        echo "Error: No se puede activar el módulo porque su programa está inactivo.";
+                        break;
+                    }
+            
+                    // Todo OK, actualizamos el módulo
+                    $sql_update = "UPDATE modulos SET estado = $estado WHERE id_modulo = '$id_modulo'";
+                    if ($conn->query($sql_update) === TRUE) {
+                        echo "Estado del módulo actualizado correctamente a " . ($estado == 1 ? "Activo" : "Inactivo") . ".";
+                    } else {
+                        echo "Error al cambiar el estado del módulo: " . $conn->error;
+                    }
+                } else {
+                    echo "Error: No se encontró el módulo o su programa relacionado.";
+                }
+                break;          
+                
         case 'busquedaPorId':
             $id_modulo = $_POST['id_modulo'];
             $sql = "SELECT * FROM modulos WHERE id_modulo='$id_modulo'";
