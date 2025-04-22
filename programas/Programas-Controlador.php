@@ -70,15 +70,28 @@ switch ($accion) {
         }
         break;
 
-    case 'cambiarEstado':
-        $id_programa = $_POST['id_programa'];
-        $estado = $_POST['estado'];
-
-        $sql = "UPDATE programas SET estado=$estado WHERE id_programa='$id_programa'";
-        echo ($conn->query($sql) === TRUE) 
-            ? "Estado cambiado exitosamente a " . ($estado == 1 ? "Activo" : "Inactivo") . "."
-            : "Error al cambiar el estado: " . $conn->error;
-        break;
+        case 'cambiarEstado':
+            $id_programa = $_POST['id_programa'];
+            $estado = $_POST['estado'];
+        
+            // Cambiar estado del programa
+            $sql_programa = "UPDATE programas SET estado = $estado WHERE id_programa = '$id_programa'";
+            $resultado = $conn->query($sql_programa);
+        
+            if ($resultado === TRUE) {
+                // Cambiar estado de los módulos (materias) asociados al programa
+                $sql_modulos = "UPDATE modulos SET estado = $estado WHERE id_programa = '$id_programa'";
+                $resultado_modulos = $conn->query($sql_modulos);
+        
+                if ($resultado_modulos === TRUE) {
+                    echo "Estado cambiado exitosamente a " . ($estado == 1 ? "Activo" : "Inactivo") . " para el programa y sus módulos.";
+                } else {
+                    echo "Programa actualizado, pero error al cambiar estado de módulos: " . $conn->error;
+                }
+            } else {
+                echo "Error al cambiar el estado del programa: " . $conn->error;
+            }
+            break;        
 
     case 'BusquedaPorId':
         $id_programa = $_POST['id_programa'];
