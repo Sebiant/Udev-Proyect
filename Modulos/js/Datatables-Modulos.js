@@ -49,6 +49,7 @@ $(document).ready(function () {
             type: 'POST',
             data: { id_modulo: idModulo, estado: nuevoEstado },
             success: function (response) {
+                alert(response);
                 table.ajax.reload();
             },
             error: function () {
