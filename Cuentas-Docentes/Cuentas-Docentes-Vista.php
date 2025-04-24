@@ -117,8 +117,15 @@
 </div>
 <div class="container mt-4">
     <div class="card">
-        <div class="card-header">
-            <h5>Cuentas de cobro</h5>
+    <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Cuentas de Cobro</h5>
+            <div>
+                <span id="badge-aceptada_docente" class="badge text-bg-success me-1">Aceptada por el docente: 0</span>
+                <span id="badge-rechazada_por_docente" class="badge text-bg-danger me-1">Rechazada por el docente: 0</span>
+                <span id="badge-pendiente_firma" class="badge text-bg-warning me-1">Pendiente de firma: 0</span>
+                <span id="badge-proceso_pago" class="badge text-bg-info me-1">En proceso de pago: 0</span>
+                <span id="badge-pagada" class="badge text-bg-success me-1">Pagada: 0</span>
+            </div>
         </div>
         <div class="card-body">
             <div class="row">
@@ -206,3 +213,31 @@
         cargarClasesEstado();
     });
 </script>
+<script>
+    function cargarCuentasEstado() {
+        $.ajax({
+            url: 'Cuentas-Docentes-Controlador.php?accion=contarCuentasEstado',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                if (data) {
+                    $('#badge-aceptada_docente').text(`Aceptada por el docente: ${data.aceptada_docente}`);
+                    $('#badge-rechazada_por_docente').text(`Rechazada por el docente: ${data.rechazada_por_docente}`);
+                    $('#badge-pendiente_firma').text(`Pendiente de firma: ${data.pendiente_firma}`);
+                    $('#badge-proceso_pago').text(`En proceso de pago: ${data.proceso_pago}`);
+                    $('#badge-pagada').text(`Pagada: ${data.pagada}`);
+                } else {
+                    console.error('Respuesta vacía o inválida del servidor');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error en la solicitud AJAX:', error);
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        cargarCuentasEstado();
+    });
+</script>
+

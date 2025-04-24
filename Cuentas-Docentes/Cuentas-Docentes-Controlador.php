@@ -115,7 +115,8 @@ case 'contarClasesEstado':
             SUM(estado = 'Reprogramada') AS reprogramada,
             SUM(estado = 'Perdida') AS perdida,
             SUM(estado = 'Vista') AS vista
-        FROM programador";
+        FROM programador
+        WHERE numero_documento = $docente";
 
     $result = $conn->query($sql);
     
@@ -133,6 +134,39 @@ case 'contarClasesEstado':
         ]);
     }
     break;
+
+    case 'contarCuentasEstado':
+        $sql = "SELECT 
+                    SUM(estado = 'creada') AS creada,
+                    SUM(estado = 'aceptada_docente') AS aceptada_docente,
+                    SUM(estado = 'pendiente_firma') AS pendiente_firma,
+                    SUM(estado = 'proceso_pago') AS proceso_pago,
+                    SUM(estado = 'pagada') AS pagada,
+                    SUM(estado = 'rechazada_por_docente') AS rechazada_por_docente,
+                    SUM(estado = 'rechazada_por_institucion') AS rechazada_por_institucion
+                FROM cuentas_cobro
+                WHERE numero_documento = '$docente'";
+    
+        $result = $conn->query($sql);
+    
+        if ($result) {
+            $data = $result->fetch_assoc();
+            echo json_encode([
+                "creada" => $data['creada'],
+                "aceptada_docente" => $data['aceptada_docente'],
+                "pendiente_firma" => $data['pendiente_firma'],
+                "proceso_pago" => $data['proceso_pago'],
+                "pagada" => $data['pagada'],
+                "rechazada_por_docente" => $data['rechazada_por_docente'],
+                "rechazada_por_institucion" => $data['rechazada_por_institucion']
+            ]);
+        } else {
+            echo json_encode([
+                "error" => "Error al contar estados de cuentas de cobro"
+            ]);
+        }
+        break;
+    
 
         
         case 'listarClases':
