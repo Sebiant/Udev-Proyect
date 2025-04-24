@@ -206,12 +206,13 @@ $result_programas = $conn->query($sql_programas);
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Clases Programadas</h5>
-            <div>
-                <span id="badge-agendada" class="badge text-bg-success me-1">Agendadas: 0</span>
-                <span id="badge-reagendada" class="badge text-bg-warning me-1">Reagendadas: 0</span>
-                <span id="badge-perdida" class="badge text-bg-danger">Perdidas: 0</span>
-            </div>
+        <div>
+            <span id="badge-agendada" class="badge text-bg-success me-1">Agendadas: 0</span>
+            <span id="badge-vista" class="badge text-bg-info">Vistas: 0</span>
+            <span id="badge-perdida" class="badge text-bg-danger me-1">Perdidas: 0</span>
+            <span id="badge-reagendada" class="badge text-bg-warning me-1">Reagendadas: 0</span>
         </div>
+    </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table id="datos_programador" class="table table-bordered table-striped">

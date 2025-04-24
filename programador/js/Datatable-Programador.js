@@ -26,11 +26,13 @@ $(document).ready(function () {
                 data: "estado",
                 render: function (data, type, row) {
                     if (data === 'Perdida') {
-                        return `<button class="btn btn-danger reprogramar-btn" data-bs-toggle="modal" data-bs-target="#modalReprogramar" data-id="${row.id_programador}">Reagendar</button>`;
+                        return `<button class="btn btn-danger w-100 reprogramar-btn" data-bs-toggle="modal" data-bs-target="#modalReprogramar" data-id="${row.id_programador}">Reagendar</button>`;
                     } else if (data === 'Agendada') {
                         return `<button class="btn btn-secondary w-100" disabled>${data}</button>`;
                     } else if (data === 'Reagendada') {
                         return `<button class="btn btn-warning text-dark w-100" disabled>${data}</button>`;
+                    } else if (data === 'Vista') {
+                        return `<button class="btn btn-info w-100" disabled>${data}</button>`;
                     } else {
                         return `<span>${data}</span>`;
                     }
