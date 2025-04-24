@@ -127,6 +127,7 @@ function ProgramarClase() {
     for (const [key, value] of formData.entries()) {
         console.log(`${key}: ${value}`);
     }
+
     $.ajax({
         url: 'Programador-Controlador.php?accion=crear',
         type: 'POST',
@@ -134,11 +135,27 @@ function ProgramarClase() {
         processData: false,
         contentType: false,
         success: function(response) {
-            console.log('Respuesta del servidor:', response);
-            location.reload();
+            try {
+                // Intenta interpretar la respuesta como JSON
+                const data = JSON.parse(response);
+
+                if (data.status === "success") {
+                    alert("✅ " + data.message);
+                    // location.reload(); // Descomenta si deseas recargar
+                } else if (data.status === "error") {
+                    alert("❌ " + data.message);
+                } else {
+                    alert("⚠️ Respuesta inesperada del servidor.");
+                    console.log(data);
+                }
+            } catch (e) {
+                console.error("❌ Error al procesar la respuesta:", response);
+                alert("❌ Ocurrió un error inesperado. Verifica la consola.");
+            }
         },
         error: function(xhr, status, error) {
-            alert('Error:', error);
+            console.error("Error AJAX:", error);
+            alert("🚫 Error en la conexión con el servidor: " + error);
         }
     });
 }

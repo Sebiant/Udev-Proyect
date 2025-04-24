@@ -71,7 +71,7 @@ $result_programas = $conn->query($sql_programas);
 <div class="container mt-5">
     <form id="formProgramador">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header text-center">
                 <h2>Programación de Clases</h2>
             </div>
             <div class="card-body">
@@ -84,7 +84,7 @@ $result_programas = $conn->query($sql_programas);
                                 <div class="form-group">
                                     <label for="periodo">Periodo</label>
                                     <select id="periodo" name="periodo" class="form-control">
-                                        <option value="">Seleccione Periodo</option>
+                                        <option value="">-- Seleccione Periodo --</option>
                                         <?php while ($row = $result_periodos->fetch_assoc()): ?>
                                             <option value="<?php echo $row['id_periodo']; ?>"><?php echo $row['nombre']; ?></option>
                                         <?php endwhile; ?>
@@ -94,7 +94,7 @@ $result_programas = $conn->query($sql_programas);
                                 <div class="form-group">
                                     <label for="programa">Programa</label>
                                     <select id="programa" name="programa" class="form-control">
-                                        <option value="">Seleccione un Programa</option>
+                                        <option value="">-- Seleccione un Programa --</option>
                                         <?php
                                         if ($result_programas->num_rows > 0) {
                                             while ($row = $result_programas->fetch_assoc()) {
@@ -126,7 +126,7 @@ $result_programas = $conn->query($sql_programas);
                                 <div class="form-group">
                                     <label for="docente">Docente</label>
                                     <select id="docente" name="docente" class="form-control">
-                                        <option value="">Seleccione Docente</option>
+                                        <option value="">-- Seleccione Docente --</option>
                                         <?php while ($row = $result_docentes->fetch_assoc()): ?>
                                             <option value="<?php echo $row['numero_documento']; ?>">
                                                 <?php echo $row['nombres'] . " " . $row['apellidos']; ?>
@@ -138,7 +138,7 @@ $result_programas = $conn->query($sql_programas);
                                 <div class="form-group">
                                     <label for="salon">Salón</label>
                                     <select id="salon" name="salon" class="form-control">
-                                        <option value="">Seleccione Salón</option>
+                                        <option value="">-- Seleccione Salón --</option>
                                         <?php while ($row = $result_salones->fetch_assoc()): ?>
                                             <option value="<?php echo $row['id_salon']; ?>">
                                                 <?php echo $row['nombre_salon']; ?>
@@ -151,7 +151,7 @@ $result_programas = $conn->query($sql_programas);
 
                                 <h5 class="mb-3">Horario</h5>
                                 <div class="form-group">
-                                    <label for="dia">Día de la Semana</label>
+                                    <label for="dia">-- Selecciona Día de la Semana --</label>
                                     <select id="dia" name="dia" class="form-control">
                                         <option value="">Seleccione Día</option>
                                         <option value="lunes">Lunes</option>
@@ -163,14 +163,20 @@ $result_programas = $conn->query($sql_programas);
                                     </select>
                                 </div>
 
-                                <div class="form-group">
+                                <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
                                     <label for="horaEntrada">Hora de Entrada</label>
                                     <input type="time" id="horaEntrada" name="horaEntrada" class="form-control">
+                                    </div>
                                 </div>
 
-                                <div class="form-group">
+                                <div class="col-md-6">
+                                    <div class="form-group">
                                     <label for="horaSalida">Hora de Salida</label>
                                     <input type="time" id="horaSalida" name="horaSalida" class="form-control">
+                                    </div>
+                                </div>
                                 </div>
 
                                 <hr>
@@ -179,6 +185,7 @@ $result_programas = $conn->query($sql_programas);
                                 <div class="form-group">
                                     <label for="modalidad">Modalidad</label>
                                     <select id="modalidad" name="modalidad" class="form-control">
+                                        <option value="">-- Selecciona la modalidad --</option>
                                         <option value="presencial">Presencial</option>
                                         <option value="virtual">Virtual</option>
                                     </select>
@@ -189,7 +196,7 @@ $result_programas = $conn->query($sql_programas);
                 </div> <!-- Fin row -->
             </div> <!-- Fin card-body -->
             <div class="card-footer text-center">
-                <button type="submit" class="btn btn-primary">Programar Clase</button>
+                <button type="button" class="btn btn-primary" onclick="ProgramarClase()">Programar Clase</button>
             </div>
         </div>
     </form>
