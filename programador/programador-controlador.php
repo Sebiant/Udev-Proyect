@@ -277,6 +277,30 @@ switch ($accion) {
         $stmt->close();
         break;
 
+    case 'contarClasesEstado':
+        $sql = "SELECT 
+                SUM(estado = 'Pendiente') AS pendiente,
+                SUM(estado = 'Reprogramada') AS reprogramada,
+                SUM(estado = 'Perdida') AS perdida
+            FROM programador";
+
+        $result = $conn->query($sql);
+        
+        if ($result) {
+            $data = $result->fetch_assoc();
+            echo json_encode([
+                "pendiente" => $data['pendiente'],
+                "reprogramada" => $data['reprogramada'],
+                "perdida" => $data['perdida']
+            ]);
+        } else {
+            echo json_encode([
+                "error" => "Error al contar clases"
+            ]);
+        }
+        break;
+
+
     default:
         $conn->query("SET lc_time_names = 'es_ES'");
 

@@ -22,16 +22,20 @@ $(document).ready(function () {
             { data: null, render: function (data, type, row) { return row.nombres + ' ' + row.apellidos; } },
             { data: "nombre_modulo" },
             { data: "modalidad" },
-            { 
+            {
                 data: "estado",
                 render: function (data, type, row) {
                     if (data === 'Perdida') {
                         return `<button class="btn btn-danger reprogramar-btn" data-bs-toggle="modal" data-bs-target="#modalReprogramar" data-id="${row.id_programador}">Reagendar</button>`;
+                    } else if (data === 'Agendada') {
+                        return `<button class="btn btn-secondary w-100" disabled>${data}</button>`;
+                    } else if (data === 'Reagendada') {
+                        return `<button class="btn btn-warning text-dark w-100" disabled>${data}</button>`;
                     } else {
                         return `<span>${data}</span>`;
                     }
                 }
-            },
+            },            
             {
                 data: "id_programador",
                 render: function (data) {
