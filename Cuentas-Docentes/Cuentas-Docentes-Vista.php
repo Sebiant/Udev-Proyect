@@ -79,8 +79,14 @@
                         </div>
                         <div class="col-md-8">
                             <div class="card h-100">
-                                <div class="card-header">
-                                    <h5>Clases Programadas</h5>
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Clases Programadas</h5>
+                                    <div>
+                                        <span id="badge-agendada" class="badge text-bg-success me-1">Agendadas: 0</span>
+                                        <span id="badge-vista" class="badge text-bg-info">Vistas: 0</span>
+                                        <span id="badge-perdida" class="badge text-bg-danger me-1">Perdidas: 0</span>
+                                        <span id="badge-reagendada" class="badge text-bg-warning me-1">Reagendadas: 0</span>
+                                    </div>
                                 </div>
                                 <div class="card-body">
                                     <div class="overflow-auto" style="max-height: 300px;">
@@ -171,3 +177,32 @@
 
 <?php include_once '../componentes/footer.php'; ?>
 <script src="js/Datatable-Cuentas-Docentes.js"></script>
+<script>
+    // Función para obtener los datos del servidor
+    function cargarClasesEstado() {
+        $.ajax({
+            url: 'Cuentas-Docentes-Controlador.php?accion=contarClasesEstado',
+            type: 'POST',
+            dataType: 'json',
+            data: { action: 'contarClasesEstado' },
+            success: function(data) {
+                // Si la respuesta contiene los datos esperados, actualizamos las etiquetas
+                if (data.pendiente !== undefined && data.reprogramada !== undefined && data.perdida !== undefined) {
+                    $('#badge-agendada').text(`Agendadas: ${data.pendiente}`);
+                    $('#badge-reagendada').text(`Reagendadas: ${data.reprogramada}`);
+                    $('#badge-perdida').text(`Perdidas: ${data.perdida}`);
+                } else {
+                    console.error('Error en los datos recibidos');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error en la solicitud AJAX:', error);
+            }
+        });
+    }
+
+    // Llamamos a la función cuando la página esté cargada
+    $(document).ready(function() {
+        cargarClasesEstado();
+    });
+</script>

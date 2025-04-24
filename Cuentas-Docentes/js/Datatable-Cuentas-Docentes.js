@@ -9,21 +9,27 @@ $(document).ready(function () {
             { "data": "hora" },
             { "data": "nombre" },
             { "data": "nombre_salon" },
-            { 
-                "data": "estado",
-                "render": function (data, type, row) {
+            {
+                data: "estado",
+                render: function (data, type, row) {
                     if (data === 'Perdida') {
-                        return '<button class="btn btn-danger reprogramar-btn" data-bs-toggle="modal" data-bs-target="#modalReprogramar" data-id="' + row.id_programador + '">Reprogramar</button>';
+                        return `<button class="btn btn-danger w-100 reprogramar-btn" data-bs-toggle="modal" data-bs-target="#modalReprogramar" data-id="${row.id_programador}">Reagendar</button>`;
+                    } else if (data === 'Pendiente') {
+                        return `<button class="btn btn-secondary w-100" disabled>${data}</button>`;
+                    } else if (data === 'Reprogramada') {
+                        return `<button class="btn btn-warning text-dark w-100" disabled>${data}</button>`;
+                    } else if (data === 'Vista') {
+                        return `<button class="btn btn-info w-100" disabled>${data}</button>`;
                     } else {
-                        return '<span>' + data + '</span>';
+                        return `<span>${data}</span>`;
                     }
                 }
-            }
+            }           
         ],
         "language": {
             "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/Spanish.json"
         },
-        "order": [],  // ⚠️ Aquí eliminamos la ordenación para respetar la del backend
+        "order": [],
         "responsive": true
     });
 
