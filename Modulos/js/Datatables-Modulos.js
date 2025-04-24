@@ -28,12 +28,16 @@ $(document).ready(function () {
             {
                 data: null,
                 render: function (data, type, row) {
+                    if (row.estado_programa == 0) {
+                        return `<button class="btn btn-secondary w-100" disabled>Programa inactivo</button>`;
+                    }
+            
                     var buttonClass = row.estado == "Activo" ? "btn-danger" : "btn-success";
                     var buttonText = row.estado == "Activo" ? "Inactivar" : "Activar";
                     return `<button class="btn ${buttonClass} w-100 btn-toggle-state">${buttonText}</button>`;
                 },
                 orderable: false
-            }
+            }            
         ]
     });
 

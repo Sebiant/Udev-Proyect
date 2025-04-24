@@ -112,13 +112,16 @@ switch ($accion) {
 
     $search = "%$search%";
 
-    $sql = "SELECT m.id_modulo, p.nombre AS programa, m.tipo, m.nombre, m.descripcion, m.estado 
-            FROM modulos m
-            JOIN programas p ON m.id_programa = p.id_programa
-            WHERE m.tipo LIKE ? OR m.nombre LIKE ? OR p.nombre LIKE ? OR m.descripcion LIKE ?
-            ORDER BY m.estado DESC
-            LIMIT ?, ?";
-    
+    $sql = "SELECT m.id_modulo, p.nombre AS programa, p.estado AS estado_programa, m.tipo, m.nombre, m.descripcion, m.estado 
+        FROM modulos m
+        JOIN programas p ON m.id_programa = p.id_programa
+        WHERE m.tipo LIKE ? OR m.nombre LIKE ? OR p.nombre LIKE ? OR m.descripcion LIKE ?
+        ORDER BY 
+            (m.estado = 0),       -- primero módulos activos (m.estado = 1 → falso = 0)
+            (p.estado = 0),       -- luego programas activos (p.estado = 1 → falso = 0)
+            p.nombre
+        LIMIT ?, ?";
+
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssssii", $search, $search, $search, $search, $start, $length);
     $stmt->execute();
