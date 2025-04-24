@@ -15,7 +15,6 @@ switch ($accion) {
             isset($_POST['modulo']) &&
             isset($_POST['modalidad'])
         ) {
-            // Aquí puedes asignar tus variables con seguridad
             $dia = $_POST['dia'];
             $hora_inicio = $_POST['horaEntrada'];
             $hora_salida = $_POST['horaSalida'];
@@ -25,8 +24,6 @@ switch ($accion) {
             $modulo = $_POST['modulo'];
             $modalidad = $_POST['modalidad'];
             $estado = 'Pendiente';
-        
-            // Continúas con tu lógica (guardar, insertar, etc.)
         } else {
             echo json_encode([
                 "status" => "error",
@@ -45,7 +42,11 @@ switch ($accion) {
             die(json_encode(['status' => 'error', 'message' => 'El horario debe estar entre 7:00 AM y 10:00 PM.']));
         }
     
-        // Obtener las fechas del período
+        // Validación 3: el docente debe estar capacitado para dictar clases
+        if (!docentePuedeDictarModulo($conn, $docente, $modulo)) {
+            die(json_encode(['status' => 'error', 'message' => 'El docente no está habilitado para dictar este módulo.']));
+        }        
+
         $sql_periodo = "SELECT fecha_inicio, fecha_fin FROM periodos WHERE id_periodo = ?";
         $stmt_periodo = $conn->prepare($sql_periodo);
         $stmt_periodo->bind_param('i', $periodo);
@@ -69,8 +70,6 @@ switch ($accion) {
         }
     
         $dia_numero = $dias[$dia];
-    
-        // Buscar la primera fecha dentro del rango que coincida con el día seleccionado
         while ($fecha_inicio->format("w") != $dia_numero) {
             $fecha_inicio->modify("+1 day");
         }
@@ -80,24 +79,14 @@ switch ($accion) {
         $contador = 0; 
         while ($fecha_inicio <= $fecha_fin) {
             $fecha_str = $fecha_inicio->format("Y-m-d");
-            
-               /* // Validación 3: No es día festivo
-                if (esFestivo($fecha_str, $conn)) {
-                    $fecha_inicio->modify("+7 days"); 
-                    continue;
-                }
-            
-                // Aquí puedes agregar tu lógica para días válidos
-                // ...
-            
+
                 $contador++; 
                 $fecha_inicio->modify("+7 days"); 
-            
     
             // Validación 4: Docente disponible
             if (!docenteDisponible($docente, $fecha_str, $hora_inicio, $hora_salida, $conn)) {
                 die(json_encode(['status' => 'error', 'message' => "El docente no está disponible el {$fecha_str} de {$hora_inicio} a {$hora_salida}"]));
-            }*/
+            }
     
             // Validación 5: Salón disponible
             if (!salonDisponible($salon, $fecha_str, $hora_inicio, $hora_salida, $conn)) {
@@ -425,6 +414,7 @@ switch ($accion) {
 }
 
 $conn->close();
+
 function docenteDisponible($docente_id, $fecha, $hora_inicio, $hora_fin, $conn, $excluir_id = null) {
     $sql = "SELECT id_programador 
             FROM programador 
@@ -449,6 +439,7 @@ function docenteDisponible($docente_id, $fecha, $hora_inicio, $hora_fin, $conn, 
 
     return ($stmt->num_rows === 0); // True si está disponible
 }
+
 function salonDisponible($salon_id, $fecha, $hora_inicio, $hora_fin, $conn, $excluir_id = null) {
     $sql = "SELECT id_programador 
             FROM programador 
@@ -473,12 +464,30 @@ function salonDisponible($salon_id, $fecha, $hora_inicio, $hora_fin, $conn, $exc
 
     return ($stmt->num_rows === 0); // True si está disponible
 }
+
 function horarioLaboralValido($hora_inicio, $hora_fin) {
     $hora_min = '07:00:00';
     $hora_max = '22:00:00';
     return ($hora_inicio >= $hora_min && $hora_fin <= $hora_max);
 }
+
 function validarHorasEntradaSalida($hora_inicio, $hora_fin) {
     return strtotime($hora_fin) > strtotime($hora_inicio);
+}
+
+function docentePuedeDictarModulo($conn, $docente, $modulo) {
+    $sql = "SELECT COUNT(*) AS total FROM docente_modulo WHERE numero_documento = ? AND id_modulo = ?";
+    $stmt = $conn->prepare($sql);
+    
+    if (!$stmt) {
+        throw new Exception("Error al preparar la consulta de validación: " . $conn->error);
+    }
+
+    $stmt->bind_param("ii", $docente, $modulo);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+
+    return $row['total'] > 0;
 }
 ?>  
