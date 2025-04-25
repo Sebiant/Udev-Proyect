@@ -17,7 +17,7 @@ $(document).ready(function () {
                     } else if (data === 'Pendiente') {
                         return `<button class="btn btn-secondary w-100" disabled>${data}</button>`;
                     } else if (data === 'Reprogramada') {
-                        return `<button class="btn btn-warning text-dark w-100" disabled>${data}</button>`;
+                        return `<button class="btn btn-warning text-white w-100" disabled>${data}</button>`;
                     } else if (data === 'Vista') {
                         return `<button class="btn btn-info w-100" disabled>${data}</button>`;
                     } else {
@@ -72,17 +72,17 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     
                     if (data === 'Aceptada por el docente') {
-                        return `<button class="btn btn-success w-100" disabled>Aceptada por docente</button>`;
+                        return `<button class="btn btn-success w-100 text-white" disabled>Aceptada por docente</button>`;
                     } else if (data === 'Pendiente de firma') {
-                        return `<button class="btn btn-warning text-dark w-100" disabled>Pendiente de firma</button>`;
+                        return `<button class="btn btn-warning text-white w-100" disabled>Pendiente de firma</button>`;
                     } else if (data === 'En proceso de pago') {
-                        return `<button class="btn btn-info w-100" disabled>En proceso de pago</button>`;
+                        return `<button class="btn btn-info w-100 text-white" disabled>En proceso de pago</button>`;
                     } else if (data === 'Pagada') {
-                        return `<button class="btn btn-success w-100" disabled>Pagada</button>`;
+                        return `<button class="btn btn-success w-100 text-white" disabled>Pagada</button>`;
                     } else if (data === 'Rechazada por el docente') {
-                        return `<button class="btn btn-danger w-100" disabled>Rechazada por docente</button>`;
+                        return `<button class="btn btn-danger w-100 text-white" disabled>Rechazada por docente</button>`;
                     } else if (data === 'Rechazada por la institucion') {
-                        return `<button class="btn btn-danger w-100" disabled>Rechazada por institución</button>`;
+                        return `<button class="btn btn-danger w-100 text-white" disabled>Rechazada por institución</button>`;
                     } else {
                         return `<span>${data}</span>`;
                     }
