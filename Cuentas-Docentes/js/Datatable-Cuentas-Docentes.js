@@ -67,7 +67,27 @@ $(document).ready(function () {
             { "data": "valor_hora" },
             { "data": "horas_trabajadas" },
             { "data": "monto" },
-            { "data": "estado" },
+            {
+                data: "estado",
+                render: function (data, type, row) {
+                    
+                    if (data === 'Aceptada por el docente') {
+                        return `<button class="btn btn-success w-100" disabled>Aceptada por docente</button>`;
+                    } else if (data === 'Pendiente de firma') {
+                        return `<button class="btn btn-warning text-dark w-100" disabled>Pendiente de firma</button>`;
+                    } else if (data === 'En proceso de pago') {
+                        return `<button class="btn btn-info w-100" disabled>En proceso de pago</button>`;
+                    } else if (data === 'Pagada') {
+                        return `<button class="btn btn-success w-100" disabled>Pagada</button>`;
+                    } else if (data === 'Rechazada por el docente') {
+                        return `<button class="btn btn-danger w-100" disabled>Rechazada por docente</button>`;
+                    } else if (data === 'Rechazada por la institucion') {
+                        return `<button class="btn btn-danger w-100" disabled>Rechazada por institución</button>`;
+                    } else {
+                        return `<span>${data}</span>`;
+                    }
+                }
+            }, 
         ]
     });
 });
