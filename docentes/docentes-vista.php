@@ -79,6 +79,12 @@ include_once '../componentes/header.php';
                             <input type="text" name="perfil_profesional" id="perfil_profesional" class="form-control" placeholder="Especialidad">
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Seleccione materias a dictar:</label>
+                            <div class="d-flex flex-wrap gap-2" id="materiasContainer" aria-label="Materias">
+                                <!-- Los botones dinámicos se agregarán aquí -->
+                            </div>
+                        </div>
+                        <div class="mb-3">
                             <label for="telefono">Teléfono:</label>
                             <input type="text" name="telefono" id="telefono" class="form-control" maxlength="10" pattern="\d{10}" placeholder="Teléfono">
                         </div>
@@ -142,9 +148,12 @@ include_once '../componentes/header.php';
                         <label for="apellidos">Apellidos:</label>
                         <input type="text" name="apellidos" class="form-control" placeholder="Apellidos">
                     </div>
-                    <div class="mb-3">
-                        <label for="perfil">Especialidad:</label>
-                        <input type="text" name="perfil_profesional" id="perfil_profesional" class="form-control" placeholder="Especialidad">
+                        <!-- en el modal de editar -->
+                        <div class="mb-3">
+                        <label class="form-label">Seleccione materias a dictar:</label>
+                        <div class="d-flex flex-wrap gap-2" id="materiasContainerEditar" aria-label="Materias">
+                            <!-- Aquí van las materias para editar -->
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="telefono">Teléfono:</label>
@@ -178,7 +187,7 @@ include_once '../componentes/header.php';
 <?php
 include_once '../componentes/footer.php';
 ?>
-<script src="js/Consultas-Docentes.js"></script>
+<script src="js/Validation-Docentes.js"></script>
 <script src="js/Datatable-Docentes.js"></script>
 <script>
     function crearDocente() {
@@ -249,11 +258,34 @@ include_once '../componentes/footer.php';
             contentType: false,
             success: function(response) {
                 console.log('Respuesta del servidor:', response);
-                //location.reload();
+                location.reload();
             },
             error: function(xhr, status, error) {
                 console.error('Error:', error);
             }
         });
     }
+</script>
+<script>
+$(document).ready(function () {
+  $.ajax({
+    url: "Docentes-Controlador.php?accion=traerMaterias",
+    method: "GET",
+    dataType: "json",
+    success: function (materias) {
+      materias.forEach(function (materia) {
+        const checkboxId = `materia_${materia.id_modulo}`;
+
+        const checkbox = `<input type="checkbox" class="btn-check" id="${checkboxId}" name="materias[]" value="${materia.id_modulo}" autocomplete="off">`;
+
+        const label = `<label class="btn btn-outline-primary" for="${checkboxId}">${materia.nombre}</label>`;
+
+        $("#materiasContainer").append(checkbox + label);
+      });
+    },
+    error: function () {
+      $("#materiasContainer").html("<p class='text-danger'>No se pudieron cargar las materias.</p>");
+    }
+  });
+});
 </script>
