@@ -24,7 +24,28 @@ $(document).ready(function() {
             { "data": "horas_trabajadas" },
             { "data": "valor_hora" },
             { "data": "monto" },
-            { "data": "estado" },
+            {
+                data: "estado",
+                render: function (data, type, row) {
+                    
+                    if (data === 'Aceptada por el docente') {
+                        return `<button class="btn btn-success w-100 text-white" disabled>Aceptada por docente</button>`;
+                    } else if (data === 'Pendiente de firma') {
+                        return `<button class="btn btn-warning w-100 text-white" disabled>Pendiente de firma</button>`;
+                    } else if (data === 'En proceso de pago') {
+                        return `<button class="btn btn-info w-100 text-white" disabled>En proceso de pago</button>`;
+                    } else if (data === 'Pagada') {
+                        return `<button class="btn btn-success w-100 text-white" disabled>Pagada</button>`;
+                    } else if (data === 'Rechazada por el docente') {
+                        return `<button class="btn btn-danger w-100 text-white" disabled>Rechazada por docente</button>`;
+                    } else if (data === 'Rechazada por la institucion') {
+                        return `<button class="btn btn-danger w-100 text-white" disabled>Rechazada por institución</button>`;
+                    } else {
+                        return `<span>${data}</span>`;
+                    }
+                    
+                }
+            }, 
             {
                 "data": null,
                 "defaultContent": '<button class="btn btn-primary btn-sm btn-verify">Verificar</button>',

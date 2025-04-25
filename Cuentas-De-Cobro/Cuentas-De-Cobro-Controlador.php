@@ -177,10 +177,7 @@ switch ($accion) {
                         (c.valor_hora * c.horas_trabajadas) AS monto, d.nombres, d.apellidos, c.estado
                 FROM cuentas_cobro c
                 JOIN docentes d ON c.numero_documento = d.numero_documento
-                WHERE c.estado <> 'creada' $searchQuery
-                ORDER BY 
-                    FIELD(c.estado, 'rechazada_por_docente', 'aceptada_docente', 'pendiente_firma', 'proceso_pago', 'pagada') ASC, 
-                    c.fecha ASC
+                WHERE c.estado <> 'creada' $searchQuery 
                 LIMIT $start, $length;";
     
         $result = $conn->query($sql);
