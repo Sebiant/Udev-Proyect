@@ -6,8 +6,9 @@ $accion = isset($_GET['accion']) ? $_GET['accion'] : 'default';
 switch ($accion) {
     case 'crear':
         header('Content-Type: application/json; charset=utf-8');
+        ob_clean(); // Limpia cualquier salida previa para evitar errores en JSON
         error_reporting(E_ALL);
-        ini_set('display_errors', 1);
+        ini_set('display_errors', 0); // No mostrar HTML de errores
     
         try {
             if (!$conn) {
@@ -86,40 +87,38 @@ switch ($accion) {
             $stmt_user->close();
     
             // Registro en docente_modulo con bucle for
-                if (!empty($_POST['id_modulo']) && is_array($_POST['id_modulo'])) {
-                    $sql_materias = "INSERT INTO docente_modulo (numero_documento, id_modulo) VALUES (?, ?)";
-                    $stmt_materias = $conn->prepare($sql_materias);
-                    if (!$stmt_materias) {
-                        throw new Exception("Error preparando inserción en docente_modulo: " . $conn->error);
-                    }
-
-                    $id_modulos = $_POST['id_modulo']; // array de materias
-
-                    for ($i = 0; $i < count($id_modulos); $i++) {
-                        $modulo_id = intval($id_modulos[$i]); // validación por si acaso
-                        $stmt_materias->bind_param('si', $_POST['numero_documento'], $modulo_id);
-                        if (!$stmt_materias->execute()) {
-                            throw new Exception("Error al insertar módulo del docente: " . $stmt_materias->error);
-                        }
-                    }
-
-                    $stmt_materias->close();
-                } else {
-                    throw new Exception("No se recibieron módulos válidos para asignar.");
+            if (!empty($_POST['id_modulo']) && is_array($_POST['id_modulo'])) {
+                $sql_materias = "INSERT INTO docente_modulo (numero_documento, id_modulo) VALUES (?, ?)";
+                $stmt_materias = $conn->prepare($sql_materias);
+                if (!$stmt_materias) {
+                    throw new Exception("Error preparando inserción en docente_modulo: " . $conn->error);
                 }
-
     
-            $stmt_materias->close();
+                foreach ($_POST['id_modulo'] as $modulo_id) {
+                    $modulo_id = intval($modulo_id);
+                    $stmt_materias->bind_param('si', $_POST['numero_documento'], $modulo_id);
+                    if (!$stmt_materias->execute()) {
+                        throw new Exception("Error al insertar módulo del docente: " . $stmt_materias->error);
+                    }
+                }
     
-            // Si todo funcionó bien
+                $stmt_materias->close();
+            } else {
+                throw new Exception("No se recibieron módulos válidos para asignar.");
+            }
+    
+            // Todo correcto
             echo json_encode(["status" => "success", "message" => "Docente y módulo registrados correctamente."]);
+            exit;
     
         } catch (Exception $e) {
-            ob_clean(); // Limpia la salida para evitar errores en JSON
+            ob_clean();
             echo json_encode(["status" => "error", "message" => "Error al crear el registro: " . $e->getMessage()]);
+            exit;
         }
     
         break;
+    
     
 
     case 'traerMaterias':

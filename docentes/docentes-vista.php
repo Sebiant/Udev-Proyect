@@ -276,7 +276,7 @@ $(document).ready(function () {
       materias.forEach(function (materia) {
         const checkboxId = `materia_${materia.id_modulo}`;
 
-        const checkbox = `<input type="checkbox" class="btn-check" id="${checkboxId}" name="materias[]" value="${materia.id_modulo}" autocomplete="off">`;
+        const checkbox = `<input type="checkbox" class="btn-check" id="${checkboxId}" name="id_modulo[]" value="${materia.id_modulo}" autocomplete="off">`;
 
         const label = `<label class="btn btn-outline-primary" for="${checkboxId}">${materia.nombre}</label>`;
 
