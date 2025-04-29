@@ -119,8 +119,6 @@ switch ($accion) {
     
         break;
     
-    
-
     case 'traerMaterias':
         $sql_materias = "SELECT id_modulo, nombre FROM modulos";
         $resultado = $conn->query($sql_materias);
@@ -134,6 +132,37 @@ switch ($accion) {
 
         echo json_encode($materias);
         break;
+
+        case 'traerMateriasDocente':
+            // Usamos $_POST['numero_documento'] en lugar de $_GET['id']
+            $id = $_POST['numero_documento'];
+            
+            // Traer todas las materias
+            $sqlTodas = "SELECT id_modulo, nombre FROM modulos";
+            $resultadoTodas = mysqli_query($conn, $sqlTodas);
+        
+            $materias = [];
+            while ($fila = mysqli_fetch_assoc($resultadoTodas)) {
+                $materias[] = $fila;
+            }
+        
+            // Traer las asignadas al docente
+            $sqlAsignadas = "SELECT id_modulo FROM docente_modulo WHERE numero_documento = ?";
+            $stmt = $conn->prepare($sqlAsignadas);
+            $stmt->bind_param("i", $id); // 'i' para integer
+            $stmt->execute();
+            $resultadoAsignadas = $stmt->get_result();
+        
+            $asignadas = [];
+            while ($fila = $resultadoAsignadas->fetch_assoc()) {
+                $asignadas[] = (int)$fila['id_modulo'];
+            }
+        
+            echo json_encode([
+                'materias' => $materias,
+                'asignadas' => $asignadas
+            ]);
+            break;       
 
     case 'Modificar':
         $numero_documento = $_POST['numero_documento'];

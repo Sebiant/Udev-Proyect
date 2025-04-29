@@ -64,12 +64,12 @@ $(document).ready(function() {
 
     $('#datos_docente').on('click', '.btn-modify', function() {
         var data = table.row($(this).parents('tr')).data();
-        var numeroDocumento = data.numero_documento; // Cambio aquí
+        var numeroDocumento = data.numero_documento;
     
         $.ajax({
             url: 'Docentes-Controlador.php?accion=buscarPorId',
             type: 'POST',
-            data: { numero_documento: numeroDocumento }, // Cambio aquí
+            data: { numero_documento: numeroDocumento },
             dataType: 'json',
             success: function(response) {
                 console.log('Respuesta del servidor:', response);
@@ -84,8 +84,11 @@ $(document).ready(function() {
                     $('#editForm [name="direccion"]').val(docente.direccion);
                     $('#editForm [name="correo"]').val(docente.correo);
                     $('#editForm [name="declara_renta"]').prop('checked', String(docente.declara_renta) === "1");
-                    $('#editForm [name="retenedor_iva"]').prop('checked', String(docente.retenedor_iva) === "1");                    
-                    $('#editModal').modal('show');
+                    $('#editForm [name="retenedor_iva"]').prop('checked', String(docente.retenedor_iva) === "1");   
+
+                    cargarMateriasParaEditar(docente.numero_documento, function() {
+                        $('#editModal').modal('show');
+                    });
                 } else {
                     alert('No se encontraron datos para el docente.');
                 }
@@ -95,6 +98,36 @@ $(document).ready(function() {
             }
         });
     });
-
     
-});
+    function cargarMateriasParaEditar(idDocente, callback) {
+    $.ajax({
+        url: "Docentes-Controlador.php?accion=traerMateriasDocente",
+        method: "POST",
+            
+        dataType: "json",
+        success: function (data) {
+            const materias = data.materias;
+            const asignadas = data.asignadas.map(id => parseInt(id));
+
+            console.log('Todas las materias:', materias);
+            console.log('IDs asignados:', asignadas);
+
+            const container = $("#materiasContainerEditar");
+            container.empty();
+
+            materias.forEach(materia => {
+                const id = `editar_materia_${materia.id_modulo}`;
+                const isChecked = asignadas.includes(parseInt(materia.id_modulo)) ? 'checked' : '';
+                const checkbox = `<input type="checkbox" class="btn-check" id="${id}" name="id_modulo[]" value="${materia.id_modulo}" ${isChecked} autocomplete="off">`;
+                const label = `<label class="btn btn-outline-primary" for="${id}">${materia.nombre}</label>`;
+                container.append(checkbox + label);
+            });
+
+            if (callback) callback(); // Mostrar modal luego de renderizar materias
+        },
+        error: function () {
+            $("#materiasContainerEditar").html("<p class='text-danger'>Error al cargar materias.</p>");
+        }
+    });
+}
+})
