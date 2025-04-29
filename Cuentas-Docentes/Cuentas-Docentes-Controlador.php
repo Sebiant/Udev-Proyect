@@ -166,47 +166,53 @@ case 'contarClasesEstado':
             ]);
         }
         break;
-    
-
-        
         case 'listarClases':
             $conn->query("SET lc_time_names = 'es_ES'");
-
+        
             $sql = "SELECT *,
-            p.id_programador,
-            p.estado,
-            DATE_FORMAT(p.fecha, '%W %d de %M de %Y') AS fecha, 
-            CONCAT(DATE_FORMAT(p.hora_inicio, '%h:%i %p'), ' - ', DATE_FORMAT(p.hora_salida, '%h:%i %p')) AS hora,
-            m.nombre,
-            s.nombre_salon 
-            FROM programador p
-            JOIN modulos m ON p.id_modulo = m.id_modulo
-            JOIN salones s ON p.id_salon = s.id_salon
-            WHERE numero_documento = ?
-            ORDER BY 
-                CASE 
-                    WHEN p.estado = 'Perdida' THEN 1 
-                    WHEN p.estado = 'Pendiente' THEN 2 
-                    ELSE 3 
-                END, 
-            p.fecha ASC";
-
-
+                p.id_programador,
+                p.estado,
+                DATE_FORMAT(p.fecha, '%W %d de %M de %Y') AS fecha, 
+                CONCAT(DATE_FORMAT(p.hora_inicio, '%h:%i %p'), ' - ', DATE_FORMAT(p.hora_salida, '%h:%i %p')) AS hora,
+                m.nombre,
+                s.nombre_salon 
+                FROM programador p
+                JOIN modulos m ON p.id_modulo = m.id_modulo
+                JOIN salones s ON p.id_salon = s.id_salon
+                WHERE numero_documento = ?
+                ORDER BY 
+                    CASE 
+                        WHEN p.estado = 'Perdida' THEN 1 
+                        WHEN p.estado = 'Pendiente' THEN 2 
+                        ELSE 3 
+                    END, 
+                p.fecha ASC";
+        
             if ($stmt = $conn->prepare($sql)) {
                 $stmt->bind_param("s", $docente);
                 $stmt->execute();
                 $resultado = $stmt->get_result();
-                    
+        
                 $clases = [];
                 while ($fila = $resultado->fetch_assoc()) {
+                    // Establecemos los estados correctos
+                    if (isset($fila['estado'])) {
+                        if ($fila['estado'] === 'Reprogramada') {
+                            $fila['estado'] = 'Reagendada';
+                        } else if ($fila['estado'] === 'Pendiente') {
+                            $fila['estado'] = 'Agendada';
+                        }
+                    }
+                
                     $clases[] = $fila;
                 }
-            
-                    echo json_encode(["data" => $clases]);
-                } else {
-                    echo json_encode(["error" => "Error en la consulta: " . $conn->error]);
-                }
+        
+                echo json_encode(["data" => $clases]);
+            } else {
+                echo json_encode(["error" => "Error en la consulta: " . $conn->error]);
+            }
             break;
+        
         
         default:
         
