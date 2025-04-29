@@ -28,12 +28,12 @@ switch ($accion) {
         $id_programa = $_POST['id_programa'];
         $tipo = $_POST['tipo'] ?? null;
         $nombre = $_POST['nombre'] ?? null;
-        $duracion_meses = $_POST['duracion_meses'] ?? null;
+        $duracion_mes = $_POST['duracion_mes'] ?? null;
         $valor_total_programa = $_POST['valor_total_programa'] ?? null;
         $descripcion = isset($_POST['descripcion']) && $_POST['descripcion'] !== '' ? $_POST['descripcion'] : null;
         $estado = $_POST['estado'] ?? null;
 
-        if (is_null($tipo) && is_null($nombre) && is_null($duracion_meses) && is_null($valor_total_programa) && is_null($descripcion) && is_null($estado)) {
+        if (is_null($tipo) && is_null($nombre) && is_null($duracion_mes) && is_null($valor_total_programa) && is_null($descripcion) && is_null($estado)) {
             echo json_encode(["success" => false, "message" => "No se han enviado datos para actualizar."]);
             break;
         }
