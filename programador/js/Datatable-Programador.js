@@ -143,7 +143,7 @@ function ProgramarClase() {
 
                 if (data.status === "success") {
                     alert("✅ " + data.message);
-                    // location.reload(); // Descomenta si deseas recargar
+                    location.reload(); 
                 } else if (data.status === "error") {
                     alert("❌ " + data.message);
                 } else {

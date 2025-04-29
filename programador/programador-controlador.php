@@ -6,15 +6,20 @@ $accion = $_GET['accion'] ?? 'default';
 switch ($accion) {
     case 'crear':
         if (
-            isset($_POST['dia']) &&
-            isset($_POST['horaEntrada']) &&
-            isset($_POST['horaSalida']) &&
-            isset($_POST['salon']) &&
-            isset($_POST['docente']) &&
-            isset($_POST['periodo']) &&
-            isset($_POST['modulo']) &&
-            isset($_POST['modalidad'])
+            empty($_POST['dia']) ||
+            empty($_POST['horaEntrada']) ||
+            empty($_POST['horaSalida']) ||
+            empty($_POST['salon']) ||
+            empty($_POST['docente']) ||
+            empty($_POST['periodo']) ||
+            empty($_POST['modulo']) ||
+            empty($_POST['modalidad'])
         ) {
+            die(json_encode([
+                "status" => "error",
+                "message" => "Faltan datos obligatorios en el formulario."
+            ]));                
+        } else {
             $dia = $_POST['dia'];
             $hora_inicio = $_POST['horaEntrada'];
             $hora_salida = $_POST['horaSalida'];
@@ -24,12 +29,6 @@ switch ($accion) {
             $modulo = $_POST['modulo'];
             $modalidad = $_POST['modalidad'];
             $estado = 'Pendiente';
-        } else {
-            echo json_encode([
-                "status" => "error",
-                "message" => "Faltan datos obligatorios en el formulario."
-            ]);
-            exit;
         }        
     
         // Validación 1: Hora de salida debe ser posterior a la de entrada
