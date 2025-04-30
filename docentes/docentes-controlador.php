@@ -133,7 +133,7 @@ switch ($accion) {
         echo json_encode($materias);
         break;
 
-        case 'traerMateriasDocente':
+    case 'traerMateriasDocente':
             // Usamos $_POST['numero_documento'] en lugar de $_GET['id']
             $id = $_POST['numero_documento'];
             

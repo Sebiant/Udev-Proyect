@@ -40,7 +40,7 @@ include_once '../componentes/header.php';
     </div>
 
 <!-- Modal para crear docente -->
-<div class="modal fade" id="modalDocentes" tabindex="-1" aria-labelledby="modalDocentesLabel" aria-hidden="true">
+<div class="modal fade" id="modalDocentes" tabindex="-1" aria-labelledby="modalDocentesLabel">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -114,7 +114,7 @@ include_once '../componentes/header.php';
 </div>
 
 <!-- Modal de edición -->
-<div id="editModal" class="modal fade" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+<div id="editModal" class="modal fade" tabindex="-1" aria-labelledby="editModalLabel">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -148,8 +148,11 @@ include_once '../componentes/header.php';
                         <label for="apellidos">Apellidos:</label>
                         <input type="text" name="apellidos" class="form-control" placeholder="Apellidos">
                     </div>
-                        <!-- en el modal de editar -->
-                        <div class="mb-3">
+                    <div class="mb-3">
+                            <label for="perfil">Especialidad:</label>
+                            <input type="text" name="perfil_profesional" id="perfil_profesional" class="form-control" placeholder="Especialidad">
+                        </div>
+                    <div class="mb-3">
                         <label class="form-label">Seleccione materias a dictar:</label>
                         <div class="d-flex flex-wrap gap-2" id="materiasContainerEditar" aria-label="Materias">
                             <!-- Aquí van las materias para editar -->
@@ -258,7 +261,7 @@ include_once '../componentes/footer.php';
             contentType: false,
             success: function(response) {
                 console.log('Respuesta del servidor:', response);
-                location.reload();
+                //location.reload();
             },
             error: function(xhr, status, error) {
                 console.error('Error:', error);
