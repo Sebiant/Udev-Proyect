@@ -170,7 +170,7 @@ switch ($accion) {
         $numero_documento = $_POST['numero_documento'] ?? null;
         $id_modulo = $_POST['id_modulo'] ?? null;
         $id_periodo = $_POST['id_periodo'] ?? null;
-        $modalidad = $_POST['modalidad'] ?? null;
+        $modalidad = "virtual";
         $estado = "Pendiente";
         $clase_original_id = $_POST['id_programador'] ?? null;
         
@@ -305,6 +305,11 @@ switch ($accion) {
             
             if ($result) {
                 $data = $result->fetch_assoc();
+                foreach ($data as $key => $value) {
+                    if (is_null($value)) {
+                        $data[$key] = 0;
+                    }
+                }
                 echo json_encode([
                     "pendiente" => $data['pendiente'],
                     "reprogramada" => $data['reprogramada'],

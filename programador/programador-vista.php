@@ -251,9 +251,7 @@ $result_programas = $conn->query($sql_programas);
                     <input type="hidden" name="id_salon" id="id_salon">
                     <input type="hidden" name="id_modulo" id="id_modulo">
                     <input type="hidden" name="id_periodo" id="id_periodo">
-                    <input type="hidden" name="modalidad" id="m">
                     
-
                     <label>Fecha:</label>
                     <input type="date" name="nueva_fecha" class="form-control" required>
 
@@ -262,6 +260,10 @@ $result_programas = $conn->query($sql_programas);
 
                     <label>Hora Salida:</label>
                     <input type="time" name="nueva_hora_salida" class="form-control" required>
+
+                    <p class="form-text text-muted mt-2" style="font-size: 0.85em;">
+                        La clase se realizará de forma virtual en la fecha y hora establecidas.
+                    </p>
 
                     <button type="button" class="btn btn-primary mt-3" onclick="reprogramarClase()">Guardar cambios</button>
                 </form>
