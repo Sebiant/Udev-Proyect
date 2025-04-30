@@ -102,7 +102,7 @@
 <?php
     include_once '../componentes/footer.php';
 ?>
-<script src="js/Consultas-Instituciones.js"></script>
+<script src="js/Validation-Instituciones.js"></script>
 <script src="js/Datatable-Instituciones.js"></script>
 <script>
       function crearInstitucion() {

@@ -67,11 +67,21 @@ switch ($accion) {
         $id_institucion = $_POST['id_institucion'];
         $estado = $_POST['estado'];
     
-        $sql = "UPDATE instituciones SET estado=$estado WHERE id_institucion='$id_institucion'";
+        $sql_institucion = "UPDATE instituciones SET estado=$estado WHERE id_institucion='$id_institucion'";
+        $resultado = $conn->query($sql_institucion);
+        
+        if ($resultado === TRUE) {
+            // Cambiar estado del salon asociados con la institucion
+            $sql_salones = "UPDATE salones SET estado = $estado WHERE id_institucion = '$id_institucion'";
+            $resultado_modulos = $conn->query($sql_modulos);
     
-        if ($conn->query($sql) === TRUE) {
+            if ($resultado_modulos === TRUE) {
+                echo "Estado cambiado exitosamente a " . ($estado == 1 ? "Activo" : "Inactivo") . " para la institución y sus salónes.";
+            } else {
+                echo "Institución actualizada, pero error al cambiar estado de salones: " . $conn->error;
+            }
         } else {
-            echo "Error al cambiar el estado: " . $conn->error;
+            echo "Error al cambiar el estado de la institución: " . $conn->error;
         }
         break;
 
