@@ -68,8 +68,8 @@
                         </div>
                         <div class="mb-3">
                             <label for="descripcion" class="form-label">Descripcion:</label>
-                            <textarea name="descripcion" id="descripcion" class="form-control" maxlength="30" placeholder="Descripción"></textarea>
-                            <small id="contadorCrear" class="contador-texto">30 caracteres disponibles</small>
+                            <textarea name="descripcion" id="descripcion" class="form-control" maxlength="150" placeholder="Descripción"></textarea>
+                            <small id="contadorCrear" class="contador-texto">150 caracteres disponibles</small>
                         </div>
                         <div class="form-group">
                             <label for="id_institucion">Institución:</label>
@@ -115,8 +115,8 @@
                     </div>
                     <div class="mb-3">
                         <label for="descripcion" class="form-label">Descripcion:</label>
-                        <textarea name="descripcion" id="descripcion_edit" class="form-control" maxlength="30" placeholder="Descripción"></textarea>
-                        <small id="contadorEditar" class="contador-texto">30 caracteres disponibles</small>
+                        <textarea name="descripcion" id="descripcion_edit" class="form-control" maxlength="150" placeholder="Descripción"></textarea>
+                        <small id="contadorEditar" class="contador-texto">150 caracteres disponibles</small>
                     </div>
                     <div class="form-group">
                         <label for="id_institucion">Institución:</label>
@@ -147,7 +147,7 @@
 <?php
     include_once '../componentes/footer.php';
 ?>
-<script src="js/Consultas-Salones.js"></script>
+<script src="js/Validation-Salones.js"></script>
 <script src="js/Datatables-Salones.js"></script>
 <script>
 function CrearSalon() {
