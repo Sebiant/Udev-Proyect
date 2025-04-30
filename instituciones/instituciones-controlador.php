@@ -73,9 +73,9 @@ switch ($accion) {
         if ($resultado === TRUE) {
             // Cambiar estado del salon asociados con la institucion
             $sql_salones = "UPDATE salones SET estado = $estado WHERE id_institucion = '$id_institucion'";
-            $resultado_modulos = $conn->query($sql_modulos);
+            $resultado_salones = $conn->query($sql_salones);
     
-            if ($resultado_modulos === TRUE) {
+            if ($resultado_salones === TRUE) {
                 echo "Estado cambiado exitosamente a " . ($estado == 1 ? "Activo" : "Inactivo") . " para la institución y sus salónes.";
             } else {
                 echo "Institución actualizada, pero error al cambiar estado de salones: " . $conn->error;
