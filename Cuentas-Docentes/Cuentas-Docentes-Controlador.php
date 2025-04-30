@@ -122,6 +122,11 @@ case 'contarClasesEstado':
     
     if ($result) {
         $data = $result->fetch_assoc();
+        foreach ($data as $key => $value) {
+            if (is_null($value)) {
+                $data[$key] = 0;
+            }
+        }
         echo json_encode([
             "pendiente" => $data['pendiente'],
             "reprogramada" => $data['reprogramada'],
@@ -151,6 +156,11 @@ case 'contarClasesEstado':
     
         if ($result) {
             $data = $result->fetch_assoc();
+            foreach ($data as $key => $value) {
+                if (is_null($value)) {
+                    $data[$key] = 0;
+                }
+            }
             echo json_encode([
                 "creada" => $data['creada'],
                 "aceptada_docente" => $data['aceptada_docente'],
