@@ -33,6 +33,10 @@ $(document).ready(function() {
             {
                 data: null,
                 render: function (data, type, row) {
+                    if (row.estado_institucion == 0) {
+                        return `<button class="btn btn-secondary w-100" disabled>Institucion inactiva</button>`;
+                    }
+
                     var buttonClass = row.estado === "Activo" ? "btn-danger" : "btn-success";
                     var buttonText = row.estado === "Activo" ? "Inactivar" : "Activar";
                     return `<button class="btn ${buttonClass} w-100 btn-cambiar-estado">${buttonText}</button>`;

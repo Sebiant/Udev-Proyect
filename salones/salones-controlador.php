@@ -108,11 +108,15 @@ switch ($accion) {
             $where = rtrim($where, " OR ") . ")";
         }
 
-        $sql = "SELECT S.id_salon, S.nombre_salon, S.capacidad, S.descripcion, i.nombre, S.estado 
+        $sql = "SELECT S.id_salon, S.nombre_salon, S.capacidad, S.descripcion, i.nombre, i.estado AS estado_institucion, S.estado 
                 FROM salones S 
                 JOIN instituciones i ON i.id_institucion = S.id_institucion
                 $where 
-                ORDER BY estado DESC, $order_by $order_dir 
+                ORDER BY 
+                    (S.estado = 0),       -- primero salones inactivos (S.estado = 1 → falso = 0)
+                    (i.estado = 0),       -- luego instituciones inactivos (i.estado = 1 → falso = 0)
+                    i.nombre
+                , $order_by $order_dir 
                 LIMIT $start, $length";
 
         $result = $conn->query($sql);
