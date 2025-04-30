@@ -158,7 +158,7 @@ if (!$result_programa) {
 include_once '../componentes/footer.php';
 ?>
 
-<script src="js/Consultas-Modulos.js"></script>
+<script src="js/Validation-Modulos.js"></script>
 <script src="js/Datatables-Modulos.js"></script>
 <script>
    function crearModulo() {
