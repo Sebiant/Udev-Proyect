@@ -165,70 +165,135 @@ switch ($accion) {
             break;       
 
     case 'Modificar':
-        $numero_documento = $_POST['numero_documento'];
-        $tipo_documento = $_POST['tipo_documento'];
-        $nombres = $_POST['nombres'];
-        $apellidos = $_POST['apellidos'];
-        $perfil_profesional = $_POST['perfil_profesional'];
-        $telefono = $_POST['telefono'];
-        $direccion = $_POST['direccion'];
-        $email = $_POST['correo'];
-
-        $retenedor_iva = isset($_POST['retenedor_iva']) && $_POST['retenedor_iva'] === 'on' ? 1 : 0;
-        $declara_renta = isset($_POST['declara_renta']) && $_POST['declara_renta'] === 'on' ? 1 : 0;
-
-        if (!validarCorreo($_POST['correo'])) {
-            echo json_encode(["status" => "error", "message" => "El correo electrónico ya está registrado."]);
+        header('Content-Type: application/json; charset=utf-8');
+        ob_clean();
+        error_reporting(E_ALL);
+        ini_set('display_errors', 0);
+    
+        try {
+            $numero_documento = $_POST['numero_documento'];
+            $tipo_documento = $_POST['tipo_documento'];
+            $nombres = $_POST['nombres'];
+            $apellidos = $_POST['apellidos'];
+            $perfil_profesional = $_POST['perfil_profesional'];
+            $telefono = $_POST['telefono'];
+            $direccion = $_POST['direccion'];
+            $email = $_POST['correo'];
+    
+            $retenedor_iva = isset($_POST['retenedor_iva']) && $_POST['retenedor_iva'] === 'on' ? 1 : 0;
+            $declara_renta = isset($_POST['declara_renta']) && $_POST['declara_renta'] === 'on' ? 1 : 0;
+    
+            if (!validarCedulaEditar($numero_documento, $numero_documento)) {
+                echo json_encode(["status" => "error", "message" => "El número de documento ya está registrado por otro docente."]);
+                exit;
+            }
+            
+            if (!validarTelefonoEditar($telefono, $numero_documento)) {
+                echo json_encode(["status" => "error", "message" => "El número de teléfono ya está registrado por otro docente."]);
+                exit;
+            }
+            
+            if (!validarCorreoEditar($email, $numero_documento)) {
+                echo json_encode(["status" => "error", "message" => "El correo electrónico ya está registrado por otro usuario."]);
+                exit;
+            }            
+    
+            // Actualizar datos del docente
+            $sql = "UPDATE docentes 
+                    SET tipo_documento = ?, nombres = ?, apellidos = ?, perfil_profesional = ?, telefono = ?, direccion = ?, declara_renta = ?, retenedor_iva = ? 
+                    WHERE numero_documento = ?";
+    
+            if ($stmt = $conn->prepare($sql)) {
+                $stmt->bind_param(
+                    "ssssssiis", 
+                    $tipo_documento, 
+                    $nombres, 
+                    $apellidos, 
+                    $perfil_profesional, 
+                    $telefono, 
+                    $direccion, 
+                    $declara_renta,
+                    $retenedor_iva,
+                    $numero_documento
+                );
+    
+                if (!$stmt->execute()) {
+                    throw new Exception("Error al actualizar el docente: " . $stmt->error);
+                }
+    
+                $stmt->close();
+            } else {
+                throw new Exception("Error al preparar consulta de docente: " . $conn->error);
+            }
+    
+            // Actualizar correo del usuario
+            $sql_usuario = "UPDATE usuarios SET correo = ? WHERE numero_documento = ?";
+            $stmt = $conn->prepare($sql_usuario);
+    
+            if ($stmt) {
+                $stmt->bind_param("ss", $email, $numero_documento);
+    
+                if (!$stmt->execute()) {
+                    throw new Exception("Error al actualizar el correo del usuario: " . $stmt->error);
+                }
+    
+                $stmt->close();
+            } else {
+                throw new Exception("Error al preparar consulta de usuario: " . $conn->error);
+            }
+    
+            // Sincronizar módulos
+            $modulos_formulario = isset($_POST['id_modulo']) ? array_map('intval', $_POST['id_modulo']) : [];
+    
+            // Obtener módulos actuales de la BD
+            $modulos_bd = [];
+            $sql_actuales = "SELECT id_modulo FROM docente_modulo WHERE numero_documento = ?";
+            $stmt_actuales = $conn->prepare($sql_actuales);
+            $stmt_actuales->bind_param('s', $numero_documento);
+            $stmt_actuales->execute();
+            $result = $stmt_actuales->get_result();
+    
+            while ($row = $result->fetch_assoc()) {
+                $modulos_bd[] = (int)$row['id_modulo'];
+            }
+    
+            $stmt_actuales->close();
+    
+            // Calcular diferencias
+            $modulos_a_insertar = array_diff($modulos_formulario, $modulos_bd);
+            $modulos_a_eliminar = array_diff($modulos_bd, $modulos_formulario);
+    
+            // Insertar nuevos módulos
+            if (!empty($modulos_a_insertar)) {
+                $sql_insert = "INSERT INTO docente_modulo (numero_documento, id_modulo) VALUES (?, ?)";
+                $stmt_insert = $conn->prepare($sql_insert);
+                foreach ($modulos_a_insertar as $nuevo_modulo) {
+                    $stmt_insert->bind_param('si', $numero_documento, $nuevo_modulo);
+                    $stmt_insert->execute();
+                }
+                $stmt_insert->close();
+            }
+    
+            // Eliminar módulos no deseados
+            if (!empty($modulos_a_eliminar)) {
+                $sql_delete = "DELETE FROM docente_modulo WHERE numero_documento = ? AND id_modulo = ?";
+                $stmt_delete = $conn->prepare($sql_delete);
+                foreach ($modulos_a_eliminar as $modulo_fuera) {
+                    $stmt_delete->bind_param('si', $numero_documento, $modulo_fuera);
+                    $stmt_delete->execute();
+                }
+                $stmt_delete->close();
+            }
+    
+            echo json_encode(["status" => "success", "message" => "Docente actualizado y módulos sincronizados correctamente."]);
+            exit;
+    
+        } catch (Exception $e) {
+            ob_clean();
+            echo json_encode(["status" => "error", "message" => "Error al editar: " . $e->getMessage()]);
             exit;
         }
-
-        $sql = "UPDATE docentes 
-                SET tipo_documento = ?, nombres = ?, apellidos = ?, perfil_profesional = ?, telefono = ?, direccion = ?, declara_renta = ?, retenedor_iva = ? 
-                WHERE numero_documento = ?";
-
-        if ($stmt = $conn->prepare($sql)) {
-            $stmt->bind_param(
-                "ssssssiis", 
-                $tipo_documento, 
-                $nombres, 
-                $apellidos, 
-                $perfil_profesional, 
-                $telefono, 
-                $direccion, 
-                $declara_renta,
-                $retenedor_iva,
-                $numero_documento
-            );
-
-            if ($stmt->execute()) {
-                echo "Registro de docente actualizado correctamente.<br>";
-            } else {
-                echo "Error al actualizar el docente: " . $stmt->error;
-            }
-
-            $stmt->close();
-        } else {
-            echo "Error al preparar consulta de docente: " . $conn->error;
-        }
-
-        $sql_usuario = "UPDATE usuarios SET correo = ? WHERE numero_documento = ?";
-        $stmt = $conn->prepare($sql_usuario);
-
-        if ($stmt) {
-            $email = $_POST['email'];
-            $stmt->bind_param("ss", $email, $numero_documento);
-
-            if ($stmt->execute()) {
-                echo "Correo del usuario actualizado correctamente.";
-            } else {
-                echo "Error al actualizar el correo del usuario: " . $stmt->error;
-            }
-
-            $stmt->close();
-        } else {
-            echo "Error al preparar consulta de usuario: " . $conn->error;
-        }
-
+    
         break;
 
     case 'cambiarEstado':
@@ -341,6 +406,20 @@ switch ($accion) {
 
 $conn->close();
 
+function validarTelefonoEditar($telefono, $numero_documento) {
+    include '../conexion.php';
+    $sql = "SELECT telefono FROM docentes WHERE telefono = ? AND numero_documento != ?";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) return false;
+    $stmt->bind_param("ss", $telefono, $numero_documento);
+    $stmt->execute();
+    $stmt->store_result();
+    $telefono_valido = ($stmt->num_rows === 0);
+    $stmt->close();
+    $conn->close();
+    return $telefono_valido;
+}
+
 function validarTelefono($telefono) {
     include '../conexion.php';
     $sql = "SELECT telefono FROM docentes WHERE telefono = ?";
@@ -355,6 +434,20 @@ function validarTelefono($telefono) {
     return $telefono_valido;
 }
 
+function validarCedulaEditar($cedula, $numero_documento) {
+    include '../conexion.php';
+    $sql = "SELECT numero_documento FROM docentes WHERE numero_documento = ? AND numero_documento != ?";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) return false;
+    $stmt->bind_param("ss", $cedula, $numero_documento);
+    $stmt->execute();
+    $stmt->store_result();
+    $cedula_valida = ($stmt->num_rows === 0);
+    $stmt->close();
+    $conn->close();
+    return $cedula_valida;
+}
+
 function validarCedula($cedula) {
     include '../conexion.php';
     $sql = "SELECT numero_documento FROM docentes WHERE numero_documento = ?";
@@ -367,6 +460,20 @@ function validarCedula($cedula) {
     $stmt->close();
     $conn->close();
     return $cedula_valida;
+}
+
+function validarCorreoEditar($correo, $numero_documento) {
+    include '../conexion.php';
+    $sql = "SELECT correo FROM usuarios WHERE correo = ? AND numero_documento != ?";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) return false;
+    $stmt->bind_param("ss", $correo, $numero_documento);
+    $stmt->execute();
+    $stmt->store_result();
+    $correo_valido = ($stmt->num_rows === 0);
+    $stmt->close();
+    $conn->close();
+    return $correo_valido;
 }
 
 function validarCorreo($correo) {
