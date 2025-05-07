@@ -179,11 +179,14 @@ switch ($accion) {
             $telefono = $_POST['telefono'];
             $direccion = $_POST['direccion'];
             $email = $_POST['correo'];
-    
+            $documento_anterior = $_POST['documento_anterior'];
+
             $retenedor_iva = isset($_POST['retenedor_iva']) && $_POST['retenedor_iva'] === 'on' ? 1 : 0;
             $declara_renta = isset($_POST['declara_renta']) && $_POST['declara_renta'] === 'on' ? 1 : 0;
     
-            if (!validarCedulaEditar($numero_documento, $numero_documento)) {
+            $documento_anterior = $_POST['documento_anterior'];
+
+            if (!validarCedulaEditar($numero_documento, $documento_anterior)) {
                 echo json_encode(["status" => "error", "message" => "El número de documento ya está registrado por otro docente."]);
                 exit;
             }

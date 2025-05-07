@@ -75,12 +75,12 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (response) {
                 console.log('Respuesta del servidor:', response);
-
                 if (response.data && response.data.length > 0) {
                     var docente = response.data[0];
-
+                
                     $('#editForm [name="tipo_documento"]').val(docente.tipo_documento);
                     $('#editForm [name="numero_documento"]').val(docente.numero_documento);
+                    $('#editForm [name="documento_anterior"]').val(docente.numero_documento); // <-- ESTA ES LA CLAVE
                     $('#editForm [name="nombres"]').val(docente.nombres);
                     $('#editForm [name="apellidos"]').val(docente.apellidos);
                     $('#editForm [name="perfil_profesional"]').val(docente.perfil_profesional);
@@ -89,13 +89,13 @@ $(document).ready(function () {
                     $('#editForm [name="correo"]').val(docente.correo);
                     $('#editForm [name="declara_renta"]').prop('checked', String(docente.declara_renta) === "1");
                     $('#editForm [name="retenedor_iva"]').prop('checked', String(docente.retenedor_iva) === "1");
-
+                
                     cargarMateriasParaEditar(docente.numero_documento, function () {
-                        // Ocultar otros modales antes de mostrar el de edición
                         $('.modal').modal('hide');
                         setTimeout(() => $('#editModal').modal('show'), 300);
                     });
-                } else {
+                }
+                else {
                     alert('No se encontraron datos para el docente.');
                 }
             },

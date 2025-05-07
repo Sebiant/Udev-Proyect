@@ -123,12 +123,11 @@ include_once '../componentes/header.php';
             </div>
             <div class="modal-body">
                 <form id="editForm">
-                    <input type="hidden" name="accion" value="editar" id="accion_editar">
-                    <input type="hidden" name="numero_documento" id="numero_documento_editar">
+                <input type="hidden" name="documento_anterior" id="documento_anterior">
 
                     <div class="mb-3">
                         <label for="tipo_documento_editar" class="form-label">Tipo de Documento:</label>
-                        <select name="tipo_documento" id="tipo_documento_editar" class="form-control" required>
+                        <select name="tipo_documento" id="tipo_documento_editar" class="form-control">
                             <option value="">-- Selecciona Tipo de Documento --</option>
                             <option value="cedula_ciudadania">Cédula de ciudadanía</option>
                             <option value="cedula_extranjeria">Cédula de Extranjería</option>

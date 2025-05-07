@@ -24,12 +24,8 @@ jQuery(document).ready(function($) {
                 required: true,
                 lettersOnly: true
             },
-            especialidad: {
+            perfil_profesional: {
                 required: true
-            },
-            descripcion_especialidad: {
-                required: true,
-                maxlength: 30
             },
             telefono: {
                 required: true,
@@ -61,12 +57,8 @@ jQuery(document).ready(function($) {
             apellidos: {
                 required: "Por favor ingresa tu apellido."
             },
-            especialidad: {
+            perfil_profesional: {
                 required: "Por favor ingresa tu especialidad."
-            },
-            descripcion_especialidad: {
-                required: "Por favor ingresa la descripción de la especialidad.",
-                maxlength: "No puedes exceder los 30 caracteres."
             },
             telefono: {
                 required: "Por favor ingresa un número de teléfono.",
@@ -112,12 +104,8 @@ jQuery(document).ready(function($) {
                     required: true,
                     lettersOnly: true
                 },
-                especialidad: {
+                perfil_profesional: {
                     required: true
-                },
-                descripcion_especialidad: {
-                    required: true,
-                    maxlength: 30
                 },
                 telefono: {
                     required: true,
@@ -147,12 +135,8 @@ jQuery(document).ready(function($) {
                 apellidos: {
                     required: "Por favor ingresa tu apellido."
                 },
-                especialidad: {
-                    required: "Por favor ingresa tu especialidad."
-                },
-                descripcion_especialidad: {
-                    required: "Por favor ingresa la descripción de la especialidad.",
-                    maxlength: "No puedes exceder los 30 caracteres."
+                perfil_profesional: {
+                    required: "Por favor ingresa tu perfil profesional."
                 },
                 telefono: {
                     required: "Por favor ingresa un número de teléfono.",
