@@ -8,11 +8,42 @@
     <link rel="stylesheet" href="../css/bootstrap.css">
 </head>
 <body>
-    
+
 <div class="container d-flex justify-content-center mt-5">
     <div class="card p-4 shadow-lg w-50 w-md-25">
         <h2 class="text-center text-dark">Iniciar Sesión</h2>
-        
+
+        <!-- Mostrar mensajes de error -->
+        <?php if (isset($_GET['error'])): ?>
+            <div class="alert alert-danger">
+                <?php
+                switch ($_GET['error']) {
+                    case 'empty_fields':
+                        echo "Todos los campos son obligatorios.";
+                        break;
+                    case 'db_connection':
+                        echo "Error de conexión con la base de datos.";
+                        break;
+                    case 'sql_error':
+                        echo "Error en la consulta de la base de datos.";
+                        break;
+                    case 'incorrect_password':
+                        echo "Contraseña incorrecta.";
+                        break;
+                    case 'email_not_found':
+                        echo "Correo no encontrado.";
+                        break;
+                    case 'session_expired':
+                        echo "Tu sesión ha expirado. Por favor, vuelve a iniciar sesión.";
+                        break;
+                    default:
+                        echo "Error desconocido.";
+                        break;
+                }
+                ?>
+            </div>
+        <?php endif; ?>
+
         <form id="loginForm" enctype="multipart/form-data" method="post" action="Login-Controlador.php">
             <div class="mb-3">
                 <label for="correo" class="form-label">Correo electrónico:</label>
