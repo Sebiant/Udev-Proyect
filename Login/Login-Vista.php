@@ -44,7 +44,7 @@
             </div>
         <?php endif; ?>
 
-        <form id="loginForm" enctype="multipart/form-data" method="post" action="Login-Controlador.php">
+        <form id="loginForm" enctype="multipart/form-data" method="post" action="Login-Controlador.php?accion=login">
             <div class="mb-3">
                 <label for="correo" class="form-label">Correo electrónico:</label>
                 <input type="email" class="form-control" id="correo" name="correo" required>
