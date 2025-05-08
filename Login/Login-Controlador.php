@@ -19,38 +19,43 @@ switch ($accion) {
 
     case 'login':
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
+    
             if (empty($_POST["correo"]) || empty($_POST["clave"])) {
                 header("Location: Login-Vista.php?error=empty_fields");
                 exit();
             }
-
+    
             $correo = trim($_POST["correo"]);
             $clave = trim($_POST["clave"]);
-
+    
             if (!$conn) {
                 header("Location: Login-Vista.php?error=db_connection");
                 exit();
             }
-
+    
             $sql = "SELECT * FROM usuarios WHERE correo = ?";
             $stmt = $conn->prepare($sql);
-
+    
             if (!$stmt) {
                 header("Location: Login-Vista.php?error=sql_error");
                 exit();
             }
-
+    
             $stmt->bind_param("s", $correo);
             $stmt->execute();
             $resultado = $stmt->get_result();
-
+    
             if ($resultado->num_rows > 0) {
                 $usuario = $resultado->fetch_assoc();
-
+    
                 if (password_verify($clave, $usuario["clave"])) {
                     $_SESSION["id"] = $usuario["id"];
                     $_SESSION["correo"] = $usuario["correo"];
+    
+                    // Mostrar ID por consola (debug)
+                    echo "<script>console.log('ID de usuario: " . $_SESSION["id"] . "');</script>";
+    
+                    // Redirigir
                     header("Location: ../Dashboard/Dashboard.php");
                     exit();
                 } else {
@@ -61,7 +66,7 @@ switch ($accion) {
                 header("Location: Login-Vista.php?error=email_not_found");
                 exit();
             }
-
+    
             $stmt->close();
             $conn->close();
         } else {
@@ -73,12 +78,12 @@ switch ($accion) {
     case 'logout':
         session_unset();
         session_destroy();
-        header("Location: Login/Login.php?message=logged_out");
+        header("Location: Login-Vista.php?message=logged_out");
         exit();
         break;
 
     default:
-        header("Location: Login/Login.php?error=invalid_action");
+        header("Location: Login-Vista.php?error=invalid_action");
         exit();
 }
 ?>
