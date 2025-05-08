@@ -48,6 +48,11 @@
         <li class="nav-item">
           <a class="nav-link" href="../Modulos/Modulos-Vista.php">Modulos</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link text-danger fw-bold" href="../Login/Login-Controlador.php?accion=logout">
+            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+          </a>
+        </li>
       </ul>
     </div>
   </div>
