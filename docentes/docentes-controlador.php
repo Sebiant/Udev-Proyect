@@ -70,7 +70,7 @@ switch ($accion) {
                 throw new Exception("Error preparando inserción en usuarios: " . $conn->error);
             }
     
-            $clave_hashed = password_hash("numero_documento", PASSWORD_DEFAULT);
+            $clave_hashed = password_hash($_POST['numero_documento'], PASSWORD_DEFAULT);
             $rol = "docente";
     
             $stmt_user->bind_param(
