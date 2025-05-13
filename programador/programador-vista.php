@@ -44,7 +44,7 @@
     color: #007bff;
 }
 </style>
-
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
 <?php
 include_once '../componentes/header.php';
 include '../conexion.php';
@@ -57,6 +57,8 @@ $result_salones = $conn->query($sql_salones);
 
 $sql_periodos = "SELECT id_periodo, nombre FROM periodos WHERE estado = 1";
 $result_periodos = $conn->query($sql_periodos);
+
+$periodos = $conn->query($sql_periodos);
 
 $sql_programas = "
     SELECT DISTINCT p.id_programa, p.nombre
@@ -206,33 +208,15 @@ $result_programas = $conn->query($sql_programas);
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Clases Programadas</h5>
-        <div>
-            <span id="badge-agendada" class="badge text-bg-success me-1">Agendadas: 0</span>
-            <span id="badge-vista" class="badge text-bg-info">Vistas: 0</span>
-            <span id="badge-perdida" class="badge text-bg-danger me-1">Perdidas: 0</span>
-            <span id="badge-reagendada" class="badge text-bg-warning me-1">Reagendadas: 0</span>
-        </div>
-    </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table id="datos_programador" class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Hora de Inicio</th>
-                            <th>Hora de Salida</th>
-                            <th>Salón</th>
-                            <th>Docente</th>
-                            <th>Materia</th>
-                            <th>Modalidad</th>
-                            <th>Estado</th>
-                            <th>Modificar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+            <div>
+                <span id="badge-agendada" class="badge text-bg-success me-1">Agendadas: 0</span>
+                <span id="badge-vista" class="badge text-bg-info">Vistas: 0</span>
+                <span id="badge-perdida" class="badge text-bg-danger me-1">Perdidas: 0</span>
+                <span id="badge-reagendada" class="badge text-bg-warning me-1">Reagendadas: 0</span>
             </div>
+        </div>
+        <div class="container mt-4">
+            <div id='calendar'></div>
         </div>
     </div>
 </div>
@@ -372,7 +356,6 @@ $result_programas = $conn->query($sql_programas);
 <?php
 include_once '../componentes/footer.php';
 ?>
-
 <script src="js/Datatable-Programador.js"></script>
 <script>
     // Función que se llama cuando haces clic en un módulo
@@ -463,5 +446,20 @@ include_once '../componentes/footer.php';
         cargarClasesEstado();
     });
 </script>
-
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+      },
+      events: 'Programador-Controlador.php', // Aquí traes los eventos desde tu backend
+      locale: 'es'
+    });
+    calendar.render();
+  });
+</script>
 

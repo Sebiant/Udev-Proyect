@@ -80,7 +80,6 @@ switch ($accion) {
             $fecha_str = $fecha_inicio->format("Y-m-d");
 
                 $contador++; 
-                $fecha_inicio->modify("+7 days"); 
     
             // Validación 4: Docente disponible
             if (!docenteDisponible($docente, $fecha_str, $hora_inicio, $hora_salida, $conn)) {
@@ -323,99 +322,39 @@ switch ($accion) {
             }
             break;
 
-
     default:
         $conn->query("SET lc_time_names = 'es_ES'");
 
-        // Obtener los parámetros de DataTables
-        $draw = isset($_POST['draw']) ? intval($_POST['draw']) : 1;
-        $start = isset($_POST['start']) ? intval($_POST['start']) : 0;
-        $length = isset($_POST['length']) ? intval($_POST['length']) : 10;
-        $search = isset($_POST['search']['value']) ? $_POST['search']['value'] : '';
-        
-        $searchQuery = "";
-        $params = [];
-        $types = "";
-        
-        // Si hay búsqueda, filtrar resultados
-        if (!empty($search)) {
-            $searchQuery = " AND (d.nombres LIKE ? OR d.apellidos LIKE ? OR s.nombre_salon LIKE ? OR m.nombre LIKE ?)";
-            $searchValue = "%{$search}%";
-            array_push($params, $searchValue, $searchValue, $searchValue, $searchValue);
-            $types .= "ssss";
-        }
-        
-        // Contar el total de registros sin filtro
-        $sqlTotal = "SELECT COUNT(*) as total FROM programador p 
-                     JOIN docentes d ON p.numero_documento = d.numero_documento
-                     JOIN salones s ON p.id_salon = s.id_salon
-                     LEFT JOIN modulos m ON p.id_modulo = m.id_modulo
-                     WHERE 1=1 $searchQuery";
-        
-        $stmtTotal = $conn->prepare($sqlTotal);
-        if (!empty($searchQuery)) {
-            $stmtTotal->bind_param($types, ...$params);
-        }
-        $stmtTotal->execute();
-        $resultTotal = $stmtTotal->get_result();
-        $totalRecords = $resultTotal->fetch_assoc()['total'];
-        
-        // Consulta principal con paginación
-        $sql = "SELECT p.*,
-                    p.id_programador, 
-                    DATE_FORMAT(p.fecha, '%W %e de %M') AS fecha,
-                    DATE_FORMAT(p.hora_inicio, '%h:%i %p') AS hora_inicio, 
-                    DATE_FORMAT(p.hora_salida, '%h:%i %p') AS hora_salida, 
-                    d.nombres,
-                    d.apellidos,
-                    s.nombre_salon, 
-                    m.nombre AS nombre_modulo
-                FROM programador p
-                JOIN docentes d ON p.numero_documento = d.numero_documento
-                JOIN salones s ON p.id_salon = s.id_salon
-                LEFT JOIN modulos m ON p.id_modulo = m.id_modulo
-                WHERE 1=1 $searchQuery
-                ORDER BY 
-                CASE 
-                    WHEN p.estado = 'Perdida' THEN 1 
-                    WHEN p.estado = 'Pendiente' THEN 2 
-                    ELSE 3 
-                END, 
-                p.fecha ASC
-                LIMIT ? OFFSET ?";
-        
-        // Agregar los parámetros de paginación
-        $params[] = $length;
-        $params[] = $start;
-        $types .= "ii";
-        
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param($types, ...$params);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $data = $result->fetch_all(MYSQLI_ASSOC);
-        
-        // Modificar los estados antes de enviarlos
-        foreach ($data as &$row) {
-            if ($row['estado'] === 'Reprogramada') {
-                $row['estado'] = 'Reagendada';
-            } elseif ($row['estado'] === 'Pendiente') {
-                $row['estado'] = 'Agendada';
-            }
-        }
-        unset($row); // buena práctica para evitar referencias accidentales
+        $sql = "SELECT 
+            p.fecha,
+            TIME_FORMAT(p.hora_inicio, '%H:%i:%s') as hora_inicio,
+            TIME_FORMAT(p.hora_salida, '%H:%i:%s') as hora_salida,
+            d.nombres,
+            d.apellidos,
+            m.nombre AS nombre_modulo
+        FROM programador p
+        JOIN docentes d ON p.numero_documento = d.numero_documento
+        LEFT JOIN modulos m ON p.id_modulo = m.id_modulo";
 
-        // Respuesta JSON para DataTables
-        $response = [
-            "draw" => $draw,
-            "recordsTotal" => $totalRecords,
-            "recordsFiltered" => $totalRecords,
-            "data" => $data
-        ];
-        
+        $result = $conn->query($sql);
+
+        $eventos = [];
+
+        while ($row = $result->fetch_assoc()) {
+            // Asegúrate de que p.fecha esté en formato YYYY-MM-DD
+            $start = $row['fecha'] . "T" . $row['hora_inicio'];
+            $end = $row['fecha'] . "T" . $row['hora_salida'];
+            
+            $eventos[] = [
+                "title" => $row['nombre_modulo'] . " - " . $row['nombres'] . " " . $row['apellidos'],
+                "start" => $start,
+                "end" => $end
+            ];
+        }
+
         header('Content-Type: application/json');
-        echo json_encode($response);
-        
+        echo json_encode($eventos);
+                
         break;
 }
 
