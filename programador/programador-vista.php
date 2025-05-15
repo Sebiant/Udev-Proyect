@@ -210,7 +210,7 @@ $result_programas = $conn->query($sql_programas);
             <h5 class="mb-0">Clases Programadas</h5>
             <div>
                 <span id="badge-agendada" class="badge text-bg-success me-1">Agendadas: 0</span>
-                <span id="badge-vista" class="badge text-bg-info">Vistas: 0</span>
+                <span id="badge-vista" class="badge text-bg-primary">Vistas: 0</span>
                 <span id="badge-perdida" class="badge text-bg-danger me-1">Perdidas: 0</span>
                 <span id="badge-reagendada" class="badge text-bg-warning me-1">Reagendadas: 0</span>
             </div>
@@ -431,6 +431,7 @@ include_once '../componentes/footer.php';
                     $('#badge-agendada').text(`Agendadas: ${data.pendiente}`);
                     $('#badge-reagendada').text(`Reagendadas: ${data.reprogramada}`);
                     $('#badge-perdida').text(`Perdidas: ${data.perdida}`);
+                    $('#badge-vista').text(`Vistas: ${data.vista}`);
                 } else {
                     console.error('Error en los datos recibidos');
                 }
@@ -449,6 +450,7 @@ include_once '../componentes/footer.php';
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
+
     var calendar = new FullCalendar.Calendar(calendarEl, {
       initialView: 'dayGridMonth',
       headerToolbar: {
@@ -456,9 +458,47 @@ include_once '../componentes/footer.php';
         center: 'title',
         right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
       },
-      events: 'Programador-Controlador.php', // Aquí traes los eventos desde tu backend
-      locale: 'es'
+      locale: 'es',
+      events: 'Programador-Controlador.php',
+        eventTimeFormat: {
+        hour: 'numeric',
+        minute: '2-digit',
+        meridiem: true,
+        hour12: true
+    },
+
+      eventDidMount: function(info) {
+        const estado = info.event.extendedProps.estado;
+
+        // Limpia cualquier clase anterior por si acaso
+        info.el.classList.remove('btn', 'btn-sm', 'btn-primary', 'btn-success', 'btn-danger', 'btn-warning');
+
+        // Aplica clase según estado
+        info.el.classList.add('btn', 'btn-sm');
+
+        switch (estado) {
+        case 'Perdida':
+            info.el.classList.add('btn', 'btn-sm', 'btn-danger', 'w-100');
+            break;
+        case 'Pendiente':
+            info.el.classList.add('btn', 'btn-sm', 'btn-success', 'w-100');
+            break;
+        case 'Reprogramada':
+            info.el.classList.add('btn', 'btn-sm', 'btn-warning', 'text-dark', 'w-100');
+            break;
+        case 'Vista':
+            info.el.classList.add('btn', 'btn-sm', 'btn-primary', 'w-100');
+            break;
+        default:
+            info.el.classList.add('btn', 'btn-sm', 'btn-primary', 'w-100');
+        }
+
+
+        // Texto blanco si se necesita contraste
+        info.el.style.color = 'white';
+      }
     });
+
     calendar.render();
   });
 </script>

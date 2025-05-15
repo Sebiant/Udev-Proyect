@@ -159,6 +159,69 @@ switch ($accion) {
             ]);
         }
         break;  
+    case 'buscarClasesProgramadasPorPeriodo':
+        $data = json_decode(file_get_contents("php://input"), true);
+        $periodo = $data['id_periodo'] ?? null;
+
+        if ($periodo !== null) {
+            $sql = "SELECT 
+                        p.id_programador AS id,
+                        p.fecha,
+                        TIME_FORMAT(p.hora_inicio, '%H:%i:%s') as hora_inicio,
+                        TIME_FORMAT(p.hora_salida, '%H:%i:%s') as hora_salida,
+                        m.nombre,
+                        d.nombres,
+                        d.apellidos
+                    FROM programador p
+                    JOIN modulos m ON p.id_modulo = m.id_modulo 
+                    JOIN docentes d ON p.numero_documento = d.numero_documento
+                    WHERE p.id_periodo = ?";
+
+            $stmt = $conn->prepare($sql);
+
+            if ($stmt) {
+                $stmt->bind_param("i", $periodo);
+                $stmt->execute();
+                $result = $stmt->get_result();
+
+                if ($result->num_rows === 0) {
+                    echo json_encode([
+                        'status' => 'success',
+                        'eventos' => [],
+                        'debug' => 'No hay clases para ese periodo o estado != 1'
+                    ]);
+                    exit;
+                }
+
+
+                $eventos = [];
+                while ($row = $result->fetch_assoc()) {
+                    $eventos[] = [
+                        "title" => $row['nombre'] . " - " . $row['nombres'] . " " . $row['apellidos'],
+                        "start" => $row['fecha'] . "T" . $row['hora_inicio'],
+                        "end" => $row['fecha'] . "T" . $row['hora_salida']
+                    ];
+                }
+
+                echo json_encode([
+                    'status' => 'success',
+                    'eventos' => $eventos
+                ]);
+
+                $stmt->close();
+            } else {
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Error al preparar la consulta: ' . $conn->error
+                ]);
+            }
+        } else {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'ID del periodo no proporcionado.'
+            ]);
+        }
+    break;
 
     case 'reprogramar':        
         // Recibir datos del formulario
@@ -331,6 +394,7 @@ switch ($accion) {
             TIME_FORMAT(p.hora_salida, '%H:%i:%s') as hora_salida,
             d.nombres,
             d.apellidos,
+            p.estado,
             m.nombre AS nombre_modulo
         FROM programador p
         JOIN docentes d ON p.numero_documento = d.numero_documento
@@ -348,7 +412,8 @@ switch ($accion) {
             $eventos[] = [
                 "title" => $row['nombre_modulo'] . " - " . $row['nombres'] . " " . $row['apellidos'],
                 "start" => $start,
-                "end" => $end
+                "end" => $end,
+                "estado" => $row['estado']
             ];
         }
 
