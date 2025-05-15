@@ -24,6 +24,7 @@ $(document).ready(function() {
             { "data": "horas_trabajadas" },
             { "data": "valor_hora" },
             { "data": "monto" },
+            { "data": "" },
             {
                 data: "estado",
                 render: function (data, type, row) {

@@ -31,6 +31,7 @@ include_once '../componentes/header.php';
                             <th>Horas trabajadas</th>
                             <th>Valor de la hora</th>
                             <th>Monto</th>
+                            <th>Saldo</th>
                             <th>Estado</th>
                             <th>Verificar</th>
                         </tr>
