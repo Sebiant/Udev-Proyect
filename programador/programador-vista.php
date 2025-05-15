@@ -447,59 +447,5 @@ include_once '../componentes/footer.php';
         cargarClasesEstado();
     });
 </script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
 
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth',
-      headerToolbar: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-      },
-      locale: 'es',
-      events: 'Programador-Controlador.php',
-        eventTimeFormat: {
-        hour: 'numeric',
-        minute: '2-digit',
-        meridiem: true,
-        hour12: true
-    },
-
-      eventDidMount: function(info) {
-        const estado = info.event.extendedProps.estado;
-
-        // Limpia cualquier clase anterior por si acaso
-        info.el.classList.remove('btn', 'btn-sm', 'btn-primary', 'btn-success', 'btn-danger', 'btn-warning');
-
-        // Aplica clase según estado
-        info.el.classList.add('btn', 'btn-sm');
-
-        switch (estado) {
-        case 'Perdida':
-            info.el.classList.add('btn', 'btn-sm', 'btn-danger', 'w-100');
-            break;
-        case 'Pendiente':
-            info.el.classList.add('btn', 'btn-sm', 'btn-success', 'w-100');
-            break;
-        case 'Reprogramada':
-            info.el.classList.add('btn', 'btn-sm', 'btn-warning', 'text-dark', 'w-100');
-            break;
-        case 'Vista':
-            info.el.classList.add('btn', 'btn-sm', 'btn-primary', 'w-100');
-            break;
-        default:
-            info.el.classList.add('btn', 'btn-sm', 'btn-primary', 'w-100');
-        }
-
-
-        // Texto blanco si se necesita contraste
-        info.el.style.color = 'white';
-      }
-    });
-
-    calendar.render();
-  });
-</script>
 
