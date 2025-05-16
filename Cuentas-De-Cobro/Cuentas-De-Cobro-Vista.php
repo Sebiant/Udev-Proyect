@@ -58,13 +58,34 @@ include_once '../componentes/header.php';
                     <form id="formCuentaCobro">
                         <input type="hidden" name="accion" value="editar">
                         <input type="hidden" name="id_cuenta" id="id_cuenta">
+
                         <div class="mb-3">
-                            <label for="horas_trabajadas" class="form-label">Horas Trabajadas</label>
+                            <label for="horas_trabajadas" class="form-label" id="label_cant_horas">Horas Trabajadas: </label>
+                            <h6 name="cant_horas" id="cant_horas"></h6>
                             <input type="number" name="horas_trabajadas" id="horas_trabajadas" class="form-control">
                         </div>
+
                         <div class="mb-3">
-                            <label for="valor_hora" class="form-label">Valor Hora</label>
+                            <label for="valor_hora" class="form-label" id="label_valor">Valor Hora: </label>
+                            <h6 name="valor" id="valor"></h6>
                             <input type="text" name="valor_hora" id="valor_hora" class="form-control">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="monto" class="form-label" id="label_monto_mostrado">Monto total:</label>
+                            <h6 id="monto_mostrado" name="monto""></h6>
+                            <input type="number" name="monto" id="monto" class="form-control d-none">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="saldo" class="form-label" id="label_saldo_mostrado">Saldo restante:</label>
+                            <h6 id="saldo_mostrado" name="saldo"></h6>
+                            <input type="number" name="saldo" id="saldo" class="form-control d-none">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="abono" class="form-label" id="label_abonar">Abonar: </label>
+                            <input type="number" name="abono" id="abono" class="form-control">
                         </div>
 
                         <div class="modal-footer">
@@ -72,6 +93,7 @@ include_once '../componentes/header.php';
                             <button type="button" class="btn btn-primary" id="btnExportar" data-id="">Exportar</button>
                             <button type="button" class="btn btn-warning" id="btnFirmado" data-id="" onclick="Firmar()">Firmado</button>
                             <button  type="button" class="btn btn-danger" id="btnDevolver" data-id="" onclick="Devolver()">Devolver</button>
+                            <button  type="button" class="btn btn-success" id="btnAbonar" data-id="" onclick="">Abonar</button>
                             </div>
 
                     </form>

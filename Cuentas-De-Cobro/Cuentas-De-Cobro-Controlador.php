@@ -1,4 +1,7 @@
 <?php
+
+use LDAP\Result;
+
 include '../conexion.php';
 
 $accion = isset($_GET['accion']) ? $_GET['accion'] : 'default';
@@ -84,6 +87,43 @@ switch ($accion) {
 
         exit;
         break;
+    case 'abonar':
+        
+    $valorAbonado = $_POST['valor_abonado'] ?? null;
+    $idCuenta = $_POST['id_cuenta'] ?? null;
+
+    if (!$valorAbonado || !$idCuenta) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Faltan datos: valor_abonado o id_cuenta.'
+        ]);
+        break;
+    }
+
+    if (!validarLimiteAbono($valorAbonado, $idCuenta)) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'El abono no es válido: puede ser menor a $10.000 o excede el monto restante.'
+        ]);
+        break;
+    }
+
+    $sql_abono = "INSERT INTO abonos (id_cuenta, valor_abonado) VALUES (?, ?)";
+    $stmt = $conn->prepare($sql_abono);
+
+    if ($stmt) {
+        $stmt->bind_param("ii", $idCuenta, $valorAbonado);
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true, 'message' => 'Abono registrado correctamente.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al registrar: ' . $stmt->error]);
+        }
+        $stmt->close();
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Error al preparar la consulta: ' . $conn->error]);
+    }
+    break;
+
 
     case 'modificar':
         $id_cuenta = $_POST['id_cuenta'];
@@ -178,7 +218,7 @@ switch ($accion) {
     
         // Consulta principal con paginación y búsqueda
         $sql = "SELECT c.id_cuenta, DATE_FORMAT(c.fecha, '%M %Y') AS fecha, c.valor_hora, c.horas_trabajadas,  
-                        (c.valor_hora * c.horas_trabajadas) AS monto, d.nombres, d.apellidos, c.estado
+                        (c.valor_hora * c.horas_trabajadas) AS monto, d.nombres, d.apellidos, c.estado, COALESCE(( SELECT SUM(a.valor_abonado) FROM abonos a WHERE a.id_cuenta = c.id_cuenta), 0) AS total_abonado 
                 FROM cuentas_cobro c
                 JOIN docentes d ON c.numero_documento = d.numero_documento
                 WHERE c.estado <> 'creada' $searchQuery 
@@ -212,10 +252,11 @@ switch ($accion) {
             while ($row = $result->fetch_assoc()) {
                 $row['valor_hora'] = '$' . number_format($row['valor_hora'], 0, ',', '.');
                 $row['monto'] = '$' . number_format($row['monto'], 0, ',', '.');
+                $row['total_abonado'] = '$' . number_format($row['total_abonado'], 0, ',', '.');
                 $row['estado'] = $estados_legibles[$row['estado']] ?? $row['estado'];
                 $data[] = $row;
             }
-    
+           
             echo json_encode([
                 'draw' => isset($_GET['draw']) ? intval($_GET['draw']) : 1,
                 'recordsTotal' => $totalRecords,
@@ -232,3 +273,38 @@ switch ($accion) {
     }
 
 $conn->close();
+
+function validarLimiteAbono($valorAbonado, $idCuenta) {
+    include '../Conexion.php';
+
+    // Rechazar abonos menores a 10.000
+    if ($valorAbonado < 10000) {
+        return false;
+    }
+
+    // Obtener el monto total y lo abonado hasta ahora
+    $sql = "SELECT 
+                (c.valor_hora * c.horas_trabajadas) AS monto, 
+                COALESCE((SELECT SUM(a.valor_abonado) FROM abonos a WHERE a.id_cuenta = c.id_cuenta), 0) AS total_abonado 
+            FROM cuentas_cobro c
+            WHERE c.id_cuenta = ?";
+
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) return false;
+
+    $stmt->bind_param("i", $idCuenta);
+    $stmt->execute();
+    $stmt->bind_result($monto, $totalAbonado);
+    $stmt->fetch();
+    $stmt->close();
+
+    $conn->close();
+
+    // Validar que el nuevo abono no exceda el monto
+    if (($totalAbonado + $valorAbonado) > $monto) {
+        return false;
+    }
+
+    return true;
+}
+

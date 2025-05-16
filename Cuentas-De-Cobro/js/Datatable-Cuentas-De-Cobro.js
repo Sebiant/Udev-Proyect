@@ -24,7 +24,7 @@ $(document).ready(function() {
             { "data": "horas_trabajadas" },
             { "data": "valor_hora" },
             { "data": "monto" },
-            { "data": "" },
+            { "data": "total_abonado" },
             {
                 data: "estado",
                 render: function (data, type, row) {
@@ -86,16 +86,28 @@ function verificarCuenta(idCuenta) {
                 $('#btnFirmado').attr('data-id', cuenta.id_cuenta);
                 $('#btnExportar').attr('data-id', cuenta.id_cuenta);
                 $('#btnDevolver').attr('data-id', cuenta.id_cuenta);
+                $('#btnAbonar').attr('data-id', cuenta.id_cuenta);
+
                 $('[name="fecha"]').text('Cuenta: ' + cuenta.fecha);
                 $('[name="modalCuentasCobroLabel"]').text(cuenta.nombres + " " + cuenta.apellidos);
+
                 $('#formCuentaCobro [name="horas_trabajadas"]').val(cuenta.horas_trabajadas);
+                $('[name="cant_horas"]').text(cuenta.horas_trabajadas + " h");
+
                 $('#formCuentaCobro [name="valor_hora"]').val(cuenta.valor_hora);
+                $('[name="valor"]').text("$ " + cuenta.valor_hora );
+
+                
+                $('[name="monto"]').text(cuenta.horas_trabajadas * cuenta.valor_hora);
+                $('[name="saldo"]').text((cuenta.horas_trabajadas * cuenta.valor_hora) - (cuenta.total_abonado || 0));
+
+                                
 
                 // Llamar a la función para actualizar los botones según el estado
                 actualizarBotones(cuenta.estado);
 
                 // Mostrar el modal
-                $('#modalCuentasCobro').modal('show');
+                $('#modalCuentasCobro').modal('show');          
             } else {
                 alert('No se encontraron datos para la cuenta de cobro.');
             }
@@ -107,19 +119,38 @@ function verificarCuenta(idCuenta) {
 }
 
 function actualizarBotones(estado) {
-    $("#btnModificar, #btnExportar, #btnFirmado, #btnDevolver").hide();
+    $("#btnModificar, #btnExportar, #btnFirmado, #btnDevolver, #btnAbonar, #horas_trabajadas, #valor_hora, #cant_horas, #valor, #monto_mostrado, #saldo_mostrado, #label_monto_mostrado, #label_saldo_mostrado, #abono, #label_abonar, #label_cant_horas, #label_valor").hide();
 
     if (estado === 'aceptada_docente' || estado === 'rechazada_por_docente') {
         $("#btnModificar").show(); 
         $("#btnDevolver").show(); 
+        $("#horas_trabajadas, #valor_hora").show();
+        $("#label_cant_horas, #label_valor").show();
     } 
     if (estado === 'aceptada_docente') {
-        $("#btnExportar").show();  
+        $("#btnExportar").show();
+        $("#horas_trabajadas, #valor_hora").show();
+        $("#label_cant_horas, #label_valor").show();
     } 
     if (estado === 'pendiente_firma') {
-        $("#btnFirmado").show();  
+        $("#btnFirmado").show(); 
+        $("#cant_horas, #valor").show(); 
+        $("#label_cant_horas, #label_valor").show();
+        $("#monto_mostrado, #label_monto_mostrado").show(); 
+    }
+    if (estado === 'proceso_pago') {
+        $("#btnAbonar").show();  
+        $("#monto_mostrado, #saldo_mostrado").show();
+        $("#label_monto_mostrado, #label_saldo_mostrado").show();
+        $("#abono, #label_abonar").show();
+    }
+    if (estado === 'pagada') {
+        $("#label_cant_horas, #cant_horas").show(); 
+        $("#label_valor, #valor").show();  // Mostrar en estado pagado también
+        $("#monto_mostrado, #label_monto_mostrado").show(); 
     }
 }
+
 
 function Firmar() {
     const btnFirmado = document.getElementById('btnFirmado');
