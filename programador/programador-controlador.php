@@ -388,7 +388,8 @@ switch ($accion) {
     default:
         $conn->query("SET lc_time_names = 'es_ES'");
 
-        $sql = "SELECT 
+        $sql = "SELECT
+            id_programador,
             p.fecha,
             TIME_FORMAT(p.hora_inicio, '%H:%i:%s') as hora_inicio,
             TIME_FORMAT(p.hora_salida, '%H:%i:%s') as hora_salida,
@@ -410,6 +411,7 @@ switch ($accion) {
             $end = $row['fecha'] . "T" . $row['hora_salida'];
             
             $eventos[] = [
+                "id_programador" => $row['id_programador'],
                 "title" => $row['nombre_modulo'] . " - " . $row['nombres'] . " " . $row['apellidos'],
                 "start" => $start,
                 "end" => $end,

@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
 
         eventDidMount: function (info) {
-            console.log("✅ Evento cargado:", info.event.title);
+            console.log("Evento cargado:", info.event.title);
 
             const estado = info.event.extendedProps.estado;
             info.el.classList.remove('btn', 'btn-sm', 'btn-primary', 'btn-success', 'btn-danger', 'btn-warning');
@@ -45,8 +45,6 @@ document.addEventListener('DOMContentLoaded', function () {
         },
 
         eventClick: function (info) {
-            console.log("🟢 Hola mundo - Se hizo clic en un evento");
-            console.log("➡️ Evento clickeado:", info.event);
 
             const idProgramador = info.event.extendedProps.id_programador;
             const estado = info.event.extendedProps.estado;
@@ -54,13 +52,14 @@ document.addEventListener('DOMContentLoaded', function () {
             if (estado === 'Perdida') {
                 $('#id_programador').val(idProgramador);
                 $('#modalReprogramar').modal('show');
-            } else {
+            } else if (estado === 'Pendiente') {
                 $.ajax({
                     url: 'Programador-Controlador.php?accion=BusquedaPorId',
                     type: 'POST',
                     data: { id_programador: idProgramador },
                     dataType: 'json',
                     success: function (response) {
+                        console.log("Respuesta recibida:", response);
                         if (response.data && response.data.length > 0) {
                             const programador = response.data[0];
                             $('#editarClaseForm [name="id_programador"]').val(programador.id_programador);
@@ -82,10 +81,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         console.error("Error en la petición AJAX:", xhr.responseText);
                     }
                 });
+            } else {
+                console.log("No se permite editar este evento con estado:", estado);
+                // alert('Este evento no se puede editar.');
             }
         }
     });
 
     calendar.render();
-    console.log("📅 Calendario renderizado");
 });
