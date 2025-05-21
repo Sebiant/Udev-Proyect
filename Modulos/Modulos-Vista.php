@@ -1,6 +1,6 @@
 <?php
-include_once '../componentes/header.php';
-include '../conexion.php';
+include_once '../Componentes/header.php';
+include '../Conexion.php';
 $sql_programa = "SELECT id_programa, nombre FROM programas WHERE estado = 1";
 $result_programa = $conn->query($sql_programa);
 if (!$result_programa) {
@@ -155,7 +155,7 @@ if (!$result_programa) {
 </div>
 
 <?php
-include_once '../componentes/footer.php';
+include_once '../Componentes/footer.php';
 ?>
 
 <script src="js/Validation-Modulos.js"></script>
