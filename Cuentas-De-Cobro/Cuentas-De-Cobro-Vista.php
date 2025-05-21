@@ -56,7 +56,6 @@ include_once '../componentes/header.php';
                 </div>
                 <div class="modal-body">
                     <form id="formCuentaCobro">
-                        <input type="hidden" name="accion" value="editar">
                         <input type="hidden" name="id_cuenta" id="id_cuenta">
 
                         <div class="mb-3">
@@ -73,7 +72,7 @@ include_once '../componentes/header.php';
 
                         <div class="mb-3">
                             <label for="monto" class="form-label" id="label_monto_mostrado">Monto total:</label>
-                            <h6 id="monto_mostrado" name="monto""></h6>
+                            <h6 id="monto_mostrado" name="monto"></h6>
                             <input type="number" name="monto" id="monto" class="form-control d-none">
                         </div>
 
@@ -85,17 +84,16 @@ include_once '../componentes/header.php';
 
                         <div class="mb-3">
                             <label for="abono" class="form-label" id="label_abonar">Abonar: </label>
-                            <input type="number" name="abono" id="abono" class="form-control">
+                            <input type="number" name="valor_abonado" id="valor_abonado" class="form-control">
                         </div>
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-success" id="btnModificar" onclick="modificarCuenta()">Modificar</button>
                             <button type="button" class="btn btn-primary" id="btnExportar" data-id="">Exportar</button>
                             <button type="button" class="btn btn-warning" id="btnFirmado" data-id="" onclick="Firmar()">Firmado</button>
-                            <button  type="button" class="btn btn-danger" id="btnDevolver" data-id="" onclick="Devolver()">Devolver</button>
-                            <button  type="button" class="btn btn-success" id="btnAbonar" data-id="" onclick="">Abonar</button>
-                            </div>
-
+                            <button type="button" class="btn btn-danger" id="btnDevolver" data-id="" onclick="Devolver()">Devolver</button>
+                            <button type="button" class="btn btn-success" id="btnAbonar" data-id="" onclick="Abonar()">Abonar</button>
+                        </div>
                     </form>
                 </div>
             </div>
