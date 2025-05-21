@@ -1,5 +1,5 @@
 <?php
-    include_once '../componentes/header.php';
+    include_once '../Componentes/header.php';
 ?>
 
 <div class="container">
@@ -100,7 +100,7 @@
 </div>
 
 <?php
-    include_once '../componentes/footer.php';
+    include_once '../Componentes/footer.php';
 ?>
 <script src="js/Validation-Instituciones.js"></script>
 <script src="js/Datatable-Instituciones.js"></script>
@@ -130,6 +130,7 @@
         });
     }
 </script>
+
 <script>
       function GuardarInstitucion() {
         if (!$("#editForm").valid()) {

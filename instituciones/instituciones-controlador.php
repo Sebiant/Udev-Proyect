@@ -1,5 +1,5 @@
 <?php
-include '../conexion.php';
+include '../Conexion.php';
 
 $accion = isset($_GET['accion']) ? $_GET['accion'] : 'default';
 
@@ -17,51 +17,50 @@ switch ($accion) {
         }
         break;
 
-        case 'editar':
-            // Validar que se haya enviado el formulario completo
-            if (!isset($_POST['id_institucion']) || empty($_POST['id_institucion'])) {
-                echo "El ID de la institución es obligatorio.";
-                break;
-            }
-        
-            // Recibir los datos del formulario
-            $id_institucion = $_POST['id_institucion'];
-            $Nombre = isset($_POST['nombre']) ? $_POST['nombre'] : null;
-            $Direccion = isset($_POST['direccion']) ? $_POST['direccion'] : null;
-           
-            // Validar que al menos un campo adicional esté presente
-            if (is_null($Nombre) && is_null($Direccion)) {
-                echo "No se han enviado datos para actualizar.";
-                break;
-            }
-        
-            // Obtener el registro actual desde la base de datos
-            $sql_select = "SELECT * FROM instituciones WHERE id_institucion = '$id_institucion'";
-            $result = $conn->query($sql_select);
-        
-            if ($result->num_rows > 0) {
-                // Actualizar solo los campos enviados
-                $fieldsToUpdate = [];
-                if (!is_null($Nombre)) {
-                    $fieldsToUpdate[] = "nombre = '$Nombre'";
-                }
-                if (!is_null($Direccion)) {
-                    $fieldsToUpdate[] = "direccion = '$Direccion'";
-                }
-        
-                // Construir la consulta de actualización dinámica
-                $sql_update = "UPDATE instituciones SET " . implode(", ", $fieldsToUpdate) . " WHERE id_institucion = '$id_institucion'";
-        
-                if ($conn->query($sql_update) === TRUE) {
-                    echo "Institución actualizada correctamente.";
-                } else {
-                    echo "Error al actualizar el registro: " . $conn->error;
-                }
-            } else {
-                echo "No se encontró el registro de la institución.";
-            }
+    case 'editar':
+        // Validar que se haya enviado el formulario completo
+        if (!isset($_POST['id_institucion']) || empty($_POST['id_institucion'])) {
+            echo "El ID de la institución es obligatorio.";
             break;
+            }
         
+        // Recibir los datos del formulario
+        $id_institucion = $_POST['id_institucion'];
+        $Nombre = isset($_POST['nombre']) ? $_POST['nombre'] : null;
+        $Direccion = isset($_POST['direccion']) ? $_POST['direccion'] : null;
+           
+        // Validar que al menos un campo adicional esté presente
+        if (is_null($Nombre) && is_null($Direccion)) {
+            echo "No se han enviado datos para actualizar.";
+        break;
+        }
+        
+        // Obtener el registro actual desde la base de datos
+        $sql_select = "SELECT * FROM instituciones WHERE id_institucion = '$id_institucion'";
+        $result = $conn->query($sql_select);
+        
+        if ($result->num_rows > 0) {
+            // Actualizar solo los campos enviados
+            $fieldsToUpdate = [];
+            if (!is_null($Nombre)) {
+                $fieldsToUpdate[] = "nombre = '$Nombre'";
+            }
+            if (!is_null($Direccion)) {
+                 $fieldsToUpdate[] = "direccion = '$Direccion'";
+            }
+        
+            // Construir la consulta de actualización dinámica
+            $sql_update = "UPDATE instituciones SET " . implode(", ", $fieldsToUpdate) . " WHERE id_institucion = '$id_institucion'";
+        
+            if ($conn->query($sql_update) === TRUE) {
+                echo "Institución actualizada correctamente.";
+            } else {
+                echo "Error al actualizar el registro: " . $conn->error;
+            }
+        } else {
+            echo "No se encontró el registro de la institución.";
+        }
+        break;
 
     case 'cambiarEstado':
         $id_institucion = $_POST['id_institucion'];
@@ -111,8 +110,7 @@ switch ($accion) {
         }
         $stmt->close();
 
-    break;
-
+        break;
     default:
         $draw = isset($_POST['draw']) ? intval($_POST['draw']) : 1;
         $start = isset($_POST['start']) ? intval($_POST['start']) : 0;
